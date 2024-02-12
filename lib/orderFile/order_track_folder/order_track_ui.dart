@@ -1,5 +1,4 @@
 import 'package:dhopai/utils/Size.dart';
-import 'package:dhopai/orderFile/order_track_folder/customer_products/customer_product_model_class.dart';
 import 'package:dhopai/orderFile/order_track_folder/timeline_tile/timeline_tile_components.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -595,7 +594,7 @@ class _OrderTrackUIState extends State<OrderTrackUI> {
                           ),
                         ),
                         TextSpan(
-                          text: '৳${(double.parse(info.amount.toString()))+(double.parse(info.charge.toString()))}',
+                          text: '৳${(double.parse(info.amount.toString()))+(double.parse(info.charge.toString()))-(double.parse(info.discount.toString()))}',
                           style: TextStyle(
                               color: Colors.black54,
                               fontSize:SizeConfig.blockSizeVertical*1.8
@@ -632,7 +631,7 @@ class _OrderTrackUIState extends State<OrderTrackUI> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                height: SizeConfig.blockSizeVertical*7.1,
+                height: SizeConfig.blockSizeVertical*8.7,
                 width: SizeConfig.blockSizeHorizontal*38,
                 //color: Colors.greenAccent,
                 child: Padding(

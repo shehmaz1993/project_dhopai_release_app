@@ -271,7 +271,7 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
                                               children: [
                                                 Text(
                                                   snapshot.data!.data![index].product!.name.toString(),
-                                                  style: TextStyle(fontSize: SizeConfig.blockSizeVertical*2.4,
+                                                  style: TextStyle(fontSize: SizeConfig.blockSizeVertical*1.9,
                                                       fontWeight: FontWeight.bold
                                                   ),
                                                 ),

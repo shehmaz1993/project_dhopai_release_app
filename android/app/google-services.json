@@ -7,20 +7,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:5342389958:android:9743067489a2b7db7b59c7",
+        "mobilesdk_app_id": "1:5342389958:android:06982b53685c00007b59c7",
         "android_client_info": {
-          "package_name": "com.dhopai.wrider"
+          "package_name": "com.dhopai.service"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "5342389958-ju6cbj4u0cakh4s8ie25ncru68vb54tc.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.dhopai.wrider",
-            "certificate_hash": "f148151205cfccdc47c194e17dca923de8f4061c"
-          }
-        },
         {
           "client_id": "5342389958-of02dngdqot4tvd249m4phf2odtea1kg.apps.googleusercontent.com",
           "client_type": 3
@@ -44,18 +36,18 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:5342389958:android:d1e9b20190a936eb7b59c7",
+        "mobilesdk_app_id": "1:5342389958:android:9743067489a2b7db7b59c7",
         "android_client_info": {
-          "package_name": "com.example.dhopai"
+          "package_name": "com.dhopai.wrider"
         }
       },
       "oauth_client": [
         {
-          "client_id": "5342389958-m9urtd7l5ndhu6mcp7l2h8hqkdurjp81.apps.googleusercontent.com",
+          "client_id": "5342389958-ju6cbj4u0cakh4s8ie25ncru68vb54tc.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.dhopai",
-            "certificate_hash": "3abf5968a841e5716c554456a03fc47e35ac27b9"
+            "package_name": "com.dhopai.wrider",
+            "certificate_hash": "f148151205cfccdc47c194e17dca923de8f4061c"
           }
         },
         {

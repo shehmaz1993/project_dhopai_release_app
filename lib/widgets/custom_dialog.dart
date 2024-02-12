@@ -315,8 +315,8 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
 
                             await  repo.addCart(
                                 widget.customerId,
-                                widget.productId,
                                 widget.serviceId,
+                                widget.productId,
                                 int.parse(_controller!.text.toString()),
                                 widget.price,
                                 widget.token,
