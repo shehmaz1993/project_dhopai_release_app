@@ -243,6 +243,7 @@ class _PaymentOrderState extends State<PaymentOrder> {
               setState(() {
                 checkDiscountAdded=false;
               });
+              prefs.remove('discount');
               Navigator.of(context).push(MaterialPageRoute(builder: (context) =>OrderConfirmationUI()));
             }
             // Navigator.pushNamed(context, homePage);
@@ -375,7 +376,7 @@ class _PaymentOrderState extends State<PaymentOrder> {
                         visible: checkDiscountAdded==true,
                         child: GestureDetector(
                             onTap: () async {
-                              print('removed');
+                             // print('removed');
                               SharedPreferences prefs = await SharedPreferences.getInstance();
                               setState(() {
                                 total=total+discount;
@@ -508,7 +509,7 @@ class _PaymentOrderState extends State<PaymentOrder> {
                               SharedPreferences prefs = await SharedPreferences.getInstance();
                               bool info=await discountOfProduct();
                               if(info==true){
-                                //  prefs.setInt('discount', discount);
+                                  prefs.setInt('discount', discount);
                                 Utils().toastMessage('you got ৳${discount} discount!');
                                 prefs.setBool('discount_added', true);
                                 setState(() {

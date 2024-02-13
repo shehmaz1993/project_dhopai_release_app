@@ -31,7 +31,7 @@ class ProductList extends StatefulWidget {
   State<ProductList> createState() => _ProductListState();
 }
 
-class _ProductListState extends State<ProductList> {
+class _ProductListState extends State<ProductList> with AutomaticKeepAliveClientMixin<ProductList> {
 
   //Future<ProductModel>? response;
   TextEditingController dress =TextEditingController();
@@ -127,10 +127,11 @@ class _ProductListState extends State<ProductList> {
   static const snackBar = SnackBar(
     content: Text('You need to log in first!'),
   );
-
+  @override
+  bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
-
+     super.build(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: FutureBuilder(
@@ -497,6 +498,8 @@ class _ProductListState extends State<ProductList> {
     );
 
   }
+
+
 
 }
 

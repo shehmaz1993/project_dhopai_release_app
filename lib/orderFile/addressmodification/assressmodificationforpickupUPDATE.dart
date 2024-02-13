@@ -18,7 +18,7 @@ class AddressModificationPickUpUpdate extends StatefulWidget {
   State<AddressModificationPickUpUpdate> createState() => _AddressModificationPickUpUpdateState();
 }
 
-class _AddressModificationPickUpUpdateState extends State<AddressModificationPickUpUpdate> {
+class _AddressModificationPickUpUpdateState extends State<AddressModificationPickUpUpdate> with AutomaticKeepAliveClientMixin<AddressModificationPickUpUpdate>{
   var postcodeController=TextEditingController();
   var streetController=TextEditingController();
   var cityController=TextEditingController();
@@ -48,9 +48,7 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
     super.initState();
 
     //getAddressFromLatLng();
-    cityController=TextEditingController(text: infoOfPickUp.city);
-    postcodeController=TextEditingController(text: infoOfPickUp.postCode);
-    streetController=TextEditingController(text: infoOfPickUp.street);
+
   }
   @override
   void dispose() {
@@ -60,8 +58,10 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
     super.dispose();
   }
   @override
+  bool get wantKeepAlive => true;
+  @override
   Widget build(BuildContext context) {
-    final PickUpInfo infoOfPickUp = Provider.of<PickUpInfo>(context, listen: false);
+    super.build(context);
     SizeConfig().init(context);
     return WillPopScope(
       onWillPop: ()async =>true,

@@ -12,10 +12,13 @@ class OrderHistory extends StatefulWidget {
   State<OrderHistory> createState() => _OrderHistoryState();
 }
 
-class _OrderHistoryState extends State<OrderHistory> {
+class _OrderHistoryState extends State<OrderHistory> with AutomaticKeepAliveClientMixin<OrderHistory> {
   Repository _repo =Repository();
   @override
+  bool get wantKeepAlive => true;
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     SizeConfig().init(context);
     return Scaffold(
       appBar: AppBar(

@@ -27,7 +27,7 @@ class MainSideBar extends StatefulWidget {
   State<MainSideBar> createState() => _MainSideBarState();
 }
 
-class _MainSideBarState extends State<MainSideBar> {
+class _MainSideBarState extends State<MainSideBar> with AutomaticKeepAliveClientMixin<MainSideBar> {
   bool isLogIn =false;
   bool isLogInNot =false;
   int numberOfProduct=0;
@@ -86,7 +86,10 @@ class _MainSideBarState extends State<MainSideBar> {
 
   }
   @override
+  bool get wantKeepAlive => true;
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     SizeConfig().init(context);
 
     final mainSideBarInfo  = Provider.of<MainSideBarInfo>(context);

@@ -21,7 +21,7 @@ class CashMemo extends StatefulWidget {
   State<CashMemo> createState() => _CashMemoState();
 }
 
-class _CashMemoState extends State<CashMemo> {
+class _CashMemoState extends State<CashMemo> with AutomaticKeepAliveClientMixin<CashMemo> {
   String? currentAddress;
   String? pickUpAddress;
   String? deliveryAddress;
@@ -180,7 +180,7 @@ class _CashMemoState extends State<CashMemo> {
         }
       });
     });
-    repo.deliveryInfo();
+   // repo.deliveryInfo();
     //  getServiceAreaData();
     // getLabelData();
     getTotal();
@@ -189,8 +189,10 @@ class _CashMemoState extends State<CashMemo> {
     //  getCurrentPosition();
   }
   @override
+  bool get wantKeepAlive => true;
+  @override
   Widget build(BuildContext context) {
-    final DeliveryInfo infoOfDelivery = Provider.of<DeliveryInfo>(context, listen: false);
+    super.build(context);
     SizeConfig().init(context);
     return Scaffold(
       appBar:AppBar(

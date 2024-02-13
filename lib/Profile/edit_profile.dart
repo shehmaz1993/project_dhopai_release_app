@@ -14,7 +14,7 @@ class EditProfile extends StatefulWidget {
   State<EditProfile> createState() => _EditProfileState();
 }
 
-class _EditProfileState extends State<EditProfile> {
+class _EditProfileState extends State<EditProfile> with AutomaticKeepAliveClientMixin<EditProfile> {
   var fname=TextEditingController();
   var lname=TextEditingController();
   var nid =TextEditingController();
@@ -48,9 +48,12 @@ class _EditProfileState extends State<EditProfile> {
       id= prefs.getInt('customer_id');
     });
   }
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final profileInfo  = Provider.of<ProfileInfoProvider>(context);
     SizeConfig().init(context);
     print(profileInfo.imageFile);

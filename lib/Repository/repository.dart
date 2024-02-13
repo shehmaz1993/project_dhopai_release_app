@@ -857,12 +857,12 @@ class Repository {
         },
         body: jsonEncode(<String, dynamic>{
           'ord_date': formattedDate,
-          'customer_id': prefs!.getInt('customer_id')!.toInt(),
+          'customer_id': prefs.getInt('customer_id')!.toInt(),
           'amount': prefs.getInt('subTotal'),
           'charge_id': prefs.getInt('chargeId'),
           'charge': prefs.getInt('charge'),
           'discount_id': null,
-          'discount_amount': 0,
+          'discount_amount': (prefs.getInt('discount')==null||prefs.getInt('discount')==0)?0:prefs.getInt('discount'),
           'payment_type': 1,
           'pickup': pickup, //prefs.getString('pick_Address'),
           'shipping': delivery //prefs.getString('ship_Address'),
@@ -1187,6 +1187,7 @@ class Repository {
 
       if (response.statusCode == 200) {
         var updateInfo = json.decode(response.body);
+        print(updateInfo);
         EasyLoading.dismiss();
         return updateInfo;
       }

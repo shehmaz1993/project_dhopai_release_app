@@ -25,7 +25,7 @@ class OrderRev extends StatefulWidget {
 }
 
 
-class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin {
+class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin,AutomaticKeepAliveClientMixin<OrderRev> {
   Repository repo= Repository();
   List<int> indTotalPrice =[];
 
@@ -131,11 +131,13 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
     }
 
   }
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
     //  _loadData();
-
+    super.build(context);
     SizeConfig().init(context);
     return token!=null? Scaffold(
       floatingActionButton: Theme(

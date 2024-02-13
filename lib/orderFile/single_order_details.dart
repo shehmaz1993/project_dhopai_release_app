@@ -12,7 +12,7 @@ class SingleOrderDetails extends StatefulWidget {
   State<SingleOrderDetails> createState() => _SingleOrderDetailsState();
 }
 
-class _SingleOrderDetailsState extends State<SingleOrderDetails> {
+class _SingleOrderDetailsState extends State<SingleOrderDetails> with AutomaticKeepAliveClientMixin<SingleOrderDetails> {
   Repository _repo=Repository();
   @override
   void initState() {
@@ -20,8 +20,10 @@ class _SingleOrderDetailsState extends State<SingleOrderDetails> {
     super.initState();
   }
   @override
+  bool get wantKeepAlive => true;
+  @override
   Widget build(BuildContext context) {
-    print(_repo.viewOrderedProducts(widget.id));
+    super.build(context);
     SizeConfig().init(context);
     return ListView(
       children:[

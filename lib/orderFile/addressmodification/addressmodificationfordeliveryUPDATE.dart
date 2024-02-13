@@ -25,7 +25,8 @@ class AddressModificationDeliveryUpdate extends StatefulWidget {
   State<AddressModificationDeliveryUpdate> createState() => _AddressModificationDeliveryUpdateState();
 }
 
-class _AddressModificationDeliveryUpdateState extends State<AddressModificationDeliveryUpdate> {
+class _AddressModificationDeliveryUpdateState extends State<AddressModificationDeliveryUpdate>
+                                                       with AutomaticKeepAliveClientMixin<AddressModificationDeliveryUpdate> {
   var postcodeController=TextEditingController();
   var streetController=TextEditingController();
   var cityController=TextEditingController();
@@ -80,11 +81,11 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
     super.dispose();
   }
 
-
+  @override
+  bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
-    print('Delivery');
-    final DeliveryInfo infoOfDelivery = Provider.of<DeliveryInfo>(context);
+     super.build(context);
     SizeConfig().init(context);
     return WillPopScope(
       onWillPop: ()async =>true,

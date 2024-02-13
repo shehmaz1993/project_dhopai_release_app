@@ -23,7 +23,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home>with TickerProviderStateMixin {
+class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Home>{
 
   late AnimationController _controller2;
   late Animation<double> animation2;
@@ -83,10 +83,12 @@ class _HomeState extends State<Home>with TickerProviderStateMixin {
     super.dispose();
     _controller2.dispose();
   }
-
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     SizeConfig().init(context);
     return PopScope(
       canPop: false,
@@ -492,4 +494,6 @@ class _HomeState extends State<Home>with TickerProviderStateMixin {
     );
 
   }
+
+
 }

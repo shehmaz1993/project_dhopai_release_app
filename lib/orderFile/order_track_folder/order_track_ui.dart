@@ -13,24 +13,34 @@ class OrderTrackUI extends StatefulWidget {
   State<OrderTrackUI> createState() => _OrderTrackUIState();
 }
 
-class _OrderTrackUIState extends State<OrderTrackUI> {
-
-
+class _OrderTrackUIState extends State<OrderTrackUI>with AutomaticKeepAliveClientMixin {
+   var total;
+  countTotalWithDiscount(){
+    final OrderTrackProvider info = Provider.of<OrderTrackProvider>(context, listen: false);
+    var a,b,c;
+    setState(() {
+      a =  (double.parse('${info.amount.toString()}'));
+      b =  (double.parse('${info.charge.toString()}'));
+      c =  (double.parse('${info.discount.toString()}'));
+      total = a+b-c;
+    });
+  }
   @override
   void initState() {
     // TODO: implement initState
-    final OrderTrackProvider info = Provider.of<OrderTrackProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp)async {
       await Provider.of<OrderTrackProvider>(context,listen: false).updateOrderInfo(widget.orderId);
 
     });
 
     super.initState();
-    print(info.items);
+    countTotalWithDiscount();
   }
-
+   @override
+   bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     OrderTrackProvider info = Provider.of<OrderTrackProvider>(context);
     SizeConfig().init(context);
     return info.map!=null? Scaffold(
@@ -554,7 +564,7 @@ class _OrderTrackUIState extends State<OrderTrackUI> {
                           ),
                         ),
                         TextSpan(
-                          text: '     ৳${double.parse(info.discount.toString())}',
+                          text: '     ৳${info.discount.toString()}',
                           style: TextStyle(
                               color: Colors.black45,
                               fontSize:SizeConfig.blockSizeVertical*1.8
@@ -594,7 +604,7 @@ class _OrderTrackUIState extends State<OrderTrackUI> {
                           ),
                         ),
                         TextSpan(
-                          text: '৳${(double.parse(info.amount.toString()))+(double.parse(info.charge.toString()))-(double.parse(info.discount.toString()))}',
+                          text: '৳${total}',
                           style: TextStyle(
                               color: Colors.black54,
                               fontSize:SizeConfig.blockSizeVertical*1.8

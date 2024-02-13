@@ -15,7 +15,7 @@ class PersonalInformation extends StatefulWidget {
   State<PersonalInformation> createState() => _PersonalInformationState();
 }
 
-class _PersonalInformationState extends State<PersonalInformation> {
+class _PersonalInformationState extends State<PersonalInformation> with AutomaticKeepAliveClientMixin<PersonalInformation> {
   final List<Icon> iconsImage = [
     Icon(Icons.person),
     Icon(Icons.person_2_rounded),
@@ -37,13 +37,13 @@ class _PersonalInformationState extends State<PersonalInformation> {
     });
     // TODO: implement initState
     super.initState();
-    phoneController=TextEditingController(text: infoOfPerson.phoneNumber);
-    firstNameController=TextEditingController(text: infoOfPerson.firstName);
-    lastNameController=TextEditingController(text: infoOfPerson.lastName);
+
   }
   @override
+  bool get wantKeepAlive => true;
+  @override
   Widget build(BuildContext context) {
-    final infoOfPerson  = Provider.of<PersonalUpdateInfo>(context);
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -84,19 +84,20 @@ class _PersonalInformationState extends State<PersonalInformation> {
                 firstNameController.text.toString(),
                 lastNameController.text.toString()
             );
+            if(response=='Customer update successfully.'){
+              Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          AddressModificationPickUpUpdate()));
+            }else{
+              Fluttertoast.showToast(
+                  msg: 'Something went wrong'
+              );
+            }
           }
 
 
-          if(response=='Customer update successfully.'){
-            Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) =>
-                        AddressModificationPickUpUpdate()));
-          }else{
-            Fluttertoast.showToast(
-                msg: 'Something went wrong'
-            );
-          }
+
 
         },
         child: Container(

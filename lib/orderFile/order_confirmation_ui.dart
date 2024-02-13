@@ -1,6 +1,7 @@
 import 'package:dhopai/home.dart';
 import 'package:dhopai/orderFile/order_track_folder/order_track_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/Size.dart';
 class OrderConfirmationUI extends StatelessWidget {
@@ -49,7 +50,8 @@ class OrderConfirmationUI extends StatelessWidget {
                 ),
                 child:  MaterialButton(
                   onPressed: () async {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) =>OrderTrackUI()));
+                    SharedPreferences prefs =await SharedPreferences.getInstance();
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) =>OrderTrackUI(orderId: prefs.getInt('current_order_id'),)));
                     },
                   child: FittedBox(
                       child: Padding(
