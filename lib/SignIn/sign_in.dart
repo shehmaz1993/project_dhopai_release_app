@@ -16,7 +16,7 @@ class SignInPage extends StatefulWidget {
   State<SignInPage> createState() => _SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateMixin {
   final List<Icon> iconsImage = [
     Icon(Icons.person),
     Icon(Icons.mail),
@@ -28,13 +28,16 @@ class _SignInPageState extends State<SignInPage> {
   bool showPassword=false;
   bool permission = false;
   bool state = false;
-  String? _selectedableText;
+  late AnimationController _controller;
   Repository repo=Repository();
 
   @override
   void initState() {
     final SignInInfo infoOfSignIn = Provider.of<SignInInfo>(context, listen: false);
-    // TODO: implement initState
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 1),
+    )..repeat();
     super.initState();
     phoneNumberController=TextEditingController(text: infoOfSignIn.phoneNumber);
     passwordController=TextEditingController(text: infoOfSignIn.password);
@@ -44,6 +47,7 @@ class _SignInPageState extends State<SignInPage> {
   void dispose() {
     phoneNumberController.dispose();
     passwordController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -77,7 +81,9 @@ class _SignInPageState extends State<SignInPage> {
                 right:  SizeConfig.blockSizeHorizontal*7
             ),
             child: state == true? Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                value: _controller.value,
+              ),
             ):Container(
               width: SizeConfig.blockSizeHorizontal*30, //266.0,
               height: SizeConfig.blockSizeVertical*6.2,  //48.0,

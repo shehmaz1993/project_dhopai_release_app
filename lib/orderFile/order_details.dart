@@ -244,7 +244,7 @@ class _PaymentOrderState extends State<PaymentOrder> {
                 checkDiscountAdded=false;
               });
               prefs.remove('discount');
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) =>OrderConfirmationUI()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>OrderConfirmationUI()));
             }
             // Navigator.pushNamed(context, homePage);
 

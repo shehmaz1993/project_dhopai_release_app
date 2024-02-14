@@ -24,10 +24,8 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
   var cityController=TextEditingController();
   String pickUpAddress='';
   Repository repo=Repository();
-  loadData(){
 
-  }
-
+  final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     final PickUpInfo infoOfPickUp = Provider.of<PickUpInfo>(context, listen: false);
@@ -88,178 +86,68 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
         drawer: Drawer(
           child: MainSideBar(),
         ),
-        bottomNavigationBar: GestureDetector(
-          onTap:() async {
-            final infoOfPickUp  = Provider.of<PickUpInfo>(context,listen: false);
-            /*SharedPreferences prefs = await SharedPreferences.getInstance();
+        bottomNavigationBar: Consumer<PickUpInfo>(
+          builder: (BuildContext context, PickUpInfo value, Widget? child) {
+            return GestureDetector(
+              onTap:() async {
+                //final infoOfPickUp  = Provider.of<PickUpInfo>(context,listen: false);
+                /*SharedPreferences prefs = await SharedPreferences.getInstance();
             setState(() {
               pickUpAddress='';
             });
             pickUpAddress='${streetController.text.toString()},${infoOfPickUp.selectedAreaName},${infoOfPickUp.zone},${cityController.text},${postcodeController.text}';
             prefs.setString('pick_Address', pickUpAddress);
             print('shared preference pick address ${prefs.getString('pick_Address')}');*/
-            Map map = await repo.updatePickUpAddress(
-                infoOfPickUp.selectedAreaId!,
-                infoOfPickUp.selectedZoneId!,
-                1,
-                infoOfPickUp.street,
-                infoOfPickUp.city,//cityController.text.toString(),
-                infoOfPickUp.postCode//postcodeController.text.toString(),
+                Map map = await repo.updatePickUpAddress(
+                    value.selectedAreaId!,
+                    value.selectedZoneId!,
+                    1,
+                    value.street,
+                    value.city,//cityController.text.toString(),
+                    value.postCode//postcodeController.text.toString(),
 
-            );
-            if(map['success']==true){
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) =>AddressModificationDeliveryUpdate())
-              );
-            }else{
-              Fluttertoast.showToast(msg: 'Address did not updated!');
-            }
+                );
+                if(map['success']==true){
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>AddressModificationDeliveryUpdate()));
+                }else{
+                  Fluttertoast.showToast(msg: 'Address did not updated!');
+                }
 
-            EasyLoading.dismiss();
-          },
-          child: Container(
-            height: SizeConfig.blockSizeVertical*6,
-            width: double.infinity,
-            color: Colors.indigo.shade700,
-            child: Row(
-              children: [
-                SizedBox(width: SizeConfig.blockSizeHorizontal*7,),
-                Container(
-                  //color: Colors.blue,
-                  height: SizeConfig.blockSizeVertical*5,
-                  width: SizeConfig.blockSizeHorizontal*83,
-                  //
-                  //
-                  // color: Colors.indigo.shade700,
-                  child: Center(
-                    child:
-                    Text('Next',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2.3,fontWeight: FontWeight.bold),),
-                  ),
-                ),
-
-                // SizedBox(width: SizeConfig.blockSizeHorizontal*1,),
-                Icon(Icons.arrow_forward_ios,color: Colors.white,size: SizeConfig.blockSizeVertical*3,)
-
-              ],
-            ),
-
-          ),
-        ),
-        body: ListView(
-          children: [
-            /* Padding(
-              padding: EdgeInsets.only(
-                  top:SizeConfig.blockSizeVertical*3,
-                  left:SizeConfig.blockSizeHorizontal*4.5,
-                  right:SizeConfig.blockSizeHorizontal*4,
-                  bottom: SizeConfig.blockSizeVertical*1
-              ),
-              child: Text('Pick Up Address',style: TextStyle(fontSize: SizeConfig.blockSizeVertical*3.0,fontWeight: FontWeight.bold),),
-            ),*/
-            //  SizedBox(height: SizeConfig.blockSizeVertical*2.5,),
-            addressModification(),
-            SizedBox(height: SizeConfig.blockSizeVertical*1.4,),
-            /*   GestureDetector(
-               onTap:() async {
-                 final infoOfPickUp  = Provider.of<PickUpInfo>(context,listen: false);
-                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                 int? fu=prefs.getInt('pickUpId');
-                 setState(() {
-                   pickUpAddress='';
-                 });
-                 pickUpAddress='${streetController.text.toString()},${infoOfPickUp.selectedAreaName},${infoOfPickUp.zone},${cityController.text},${postcodeController.text}';
-                 prefs.setString('pick_Address', pickUpAddress);
-                 print('shared preference pick address ${prefs.getString('pick_Address')}');
-                 await repo.updatePickUpAddress(infoOfPickUp.selectedAreaId!,infoOfPickUp.selectedZoneId!,1, infoOfPickUp.street,  cityController.text.toString(), postcodeController.text.toString(),context,fu!);
-
-
-                 Navigator.of(context).push(
-                     MaterialPageRoute(builder: (context) =>AddressModificationDeliveryUpdate())
-                 );
-                 EasyLoading.dismiss();
-               },
-               child: Container(
-                 height: SizeConfig.blockSizeVertical*6,
-                 width: double.infinity,
-                 color: Colors.indigo.shade700,
-                 child: Row(
-                  children: [
-                   SizedBox(width: SizeConfig.blockSizeHorizontal*7,),
-                    Container(
-                       //color: Colors.blue,
-                       height: SizeConfig.blockSizeVertical*5,
-                       width: SizeConfig.blockSizeHorizontal*83,
-                      //
-                       //
-                       // color: Colors.indigo.shade700,
-                       child: Center(
-                         child:
-                         Text('Next',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2.3,fontWeight: FontWeight.bold),),
-                       ),
-                     ),
-
-                  // SizedBox(width: SizeConfig.blockSizeHorizontal*1,),
-                   Icon(Icons.arrow_forward_ios,color: Colors.white,size: SizeConfig.blockSizeVertical*3,)
-
-                 ],
-               ),
-
-           ),
-             )*/
-            /* Container(
-                // color: Colors.yellow,
-                height: SizeConfig.blockSizeVertical*5,
-                width: SizeConfig.blockSizeHorizontal*90,
+                EasyLoading.dismiss();
+              },
+              child: Container(
+                height: SizeConfig.blockSizeVertical*6,
+                width: double.infinity,
+                color: Colors.indigo.shade700,
                 child: Row(
                   children: [
-                    SizedBox(width: SizeConfig.blockSizeHorizontal*3,),
-                    GestureDetector(
-                      onTap:() async {
-                        final infoOfPickUp  = Provider.of<PickUpInfo>(context,listen: false);
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                        int? fu=prefs.getInt('pickUpId');
-                        setState(() {
-                          pickUpAddress='';
-                        });
-                        pickUpAddress='${streetController.text.toString()},${infoOfPickUp.selectedAreaName},${infoOfPickUp.zone},${cityController.text},${postcodeController.text}';
-                        prefs.setString('pick_Address', pickUpAddress);
-                        await repo.updatePickUpAddress(infoOfPickUp.selectedAreaId!,infoOfPickUp.selectedZoneId!,1, infoOfPickUp.street,  cityController.text.toString(), postcodeController.text.toString(),context,fu!);
-
-                     /*  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context){
-                          return CashMemo();
-                        }), (r){
-                          return false;
-                        });*/
-                     //   Navigator.of(context)
-                       //     .pushNamedAndRemoveUntil(cashMemo, (Route<dynamic> route) => false);
-                      // Navigator.pushNamed(context, cashMemo);
-
-                       // Navigator.pop(context);
-                        Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) =>AddressModificationDeliveryUpdate())
-                        );
-                        EasyLoading.dismiss();
-                      },
-
-                      child: Container(
-                        //color: Colors.blue,
-                        height: SizeConfig.blockSizeVertical*5,
-                        width: SizeConfig.blockSizeHorizontal*90,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.cyan.shade700,
-                        ),
-                        child: Center(
-                          child:
-                          Text('Update',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2,fontWeight: FontWeight.bold),),
-                        ),
+                    SizedBox(width: SizeConfig.blockSizeHorizontal*7,),
+                    Container(
+                      //color: Colors.blue,
+                      height: SizeConfig.blockSizeVertical*5,
+                      width: SizeConfig.blockSizeHorizontal*83,
+                      //
+                      //
+                      // color: Colors.indigo.shade700,
+                      child: Center(
+                        child:
+                        Text('Next',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2.3,fontWeight: FontWeight.bold),),
                       ),
                     ),
-                    SizedBox(width: SizeConfig.blockSizeHorizontal*3,),
+
+                    // SizedBox(width: SizeConfig.blockSizeHorizontal*1,),
+                    Icon(Icons.arrow_forward_ios,color: Colors.white,size: SizeConfig.blockSizeVertical*3,)
 
                   ],
                 ),
-              ),*/
+
+              ),
+            );
+          },),
+        body: ListView(
+          children: [
+            addressModification(),
+            SizedBox(height: SizeConfig.blockSizeVertical*1.4,),
 
           ],
         ),
@@ -268,7 +156,7 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
     );
   }
   Widget addressModification(){
-    final infoOfPickUp  = Provider.of<PickUpInfo>(context);
+   // final infoOfPickUp  = Provider.of<PickUpInfo>(context);
     return Padding(
         padding:  EdgeInsets.only(
             top:SizeConfig.blockSizeVertical*2,
@@ -293,6 +181,7 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
               color: Colors.grey.shade100,
             ),
             child: Consumer<PickUpInfo>(
+              key: _formKey,
               builder: (context,value,child) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,52 +189,7 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
                     Column(
                       children: [
                         SizedBox(height:SizeConfig.blockSizeVertical*2.8 ,),
-                        /* Row(
-                          children: [
-                            SizedBox(width: SizeConfig.blockSizeHorizontal*4,),
-                            Text('Address label   :',style:TextStyle(fontSize: SizeConfig.blockSizeVertical*2.3,fontWeight: FontWeight.bold) ,),
-                            SizedBox(width: SizeConfig.blockSizeHorizontal*4,),
 
-                            if(value.label.isEmpty)
-                              const Center(child: CircularProgressIndicator(),)
-                            else
-                              DropdownButton<String>(
-                                underline: Container(),
-                                hint: Text('Select label'),
-                                icon: Icon(Icons.keyboard_arrow_down_rounded),
-                                // isDense: true,
-                                //isExpanded: true,
-                                items:value.label.map((ar) {
-                                  return DropdownMenuItem<String>(
-                                    value: ar['lable'],
-                                    child: Text(ar['lable']),
-                                  );
-                                }
-                                ).toList(),
-                                value: value.labelName!.isEmpty?null:value.labelName,
-                                onChanged: ( val) {
-                                  setState(() {
-                                    value.setLabelName(val!);
-                                    print(value.labelName);
-                                    for(int i=0;i<value.label.length;i++){
-                                      if(value.label[i]['lable']==val){
-
-                                        value.setLabelId(value!.label[i]['id']);
-
-                                      }
-                                    }
-                                    // print(_zones);
-                                    print(' label id ${value.labelId}');
-                                    value.setIsSelectedLabel(true);
-                                  });
-
-                                },
-
-                              ),
-
-                          ],
-                        ),*/
-                        //  SizedBox(height:SizeConfig.blockSizeVertical*1.7 ,),
                         Padding(
                           padding:  EdgeInsets.only(left:SizeConfig.blockSizeHorizontal*3),
                           child: Column(
@@ -439,7 +283,7 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
                                         );
                                       }
                                       ).toList(),
-                                      value: value.zone==''?null:value!.zone,
+                                      value: value.zone==''?null:value.zone,
                                       onChanged: (String? newValue){
                                         value.setZoneName(newValue!);
                                         for(int i=0;i<value.zones.length;i++){
@@ -492,8 +336,8 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
                                           top: SizeConfig.blockSizeVertical*0.12
                                       ),
                                     ),
-                                    onChanged: infoOfPickUp.setCity,
-                                    onSubmitted: infoOfPickUp.setCity,
+                                    onChanged: value.setCity,
+                                    onSubmitted: value.setCity,
 
                                   ),
                                 ),
@@ -530,8 +374,8 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
                                           top: SizeConfig.blockSizeVertical*0.12
                                       ),
                                     ),
-                                    onChanged: infoOfPickUp.setPostCode,
-                                    onSubmitted: infoOfPickUp.setPostCode,
+                                    onChanged: value.setPostCode,
+                                    onSubmitted: value.setPostCode,
                                   ),
                                 ),
                               )
@@ -564,8 +408,8 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
                                         border: InputBorder.none,
                                         hintText: 'Enter address'
                                     ),
-                                    onChanged: infoOfPickUp.setStreet,
-                                    onSubmitted: infoOfPickUp.setStreet,
+                                    onChanged: value.setStreet,
+                                    onSubmitted: value.setStreet,
                                   ),
                                 ),
 

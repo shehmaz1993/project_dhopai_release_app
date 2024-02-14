@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen>with TickerProviderStateMixi
      Flushbar(message: 'You are connected to Internet!',backgroundColor: Colors.green,flushbarPosition: FlushbarPosition.TOP,
        flushbarStyle: FlushbarStyle.FLOATING,isDismissible: false, duration: Duration(seconds: 5),reverseAnimationCurve: Curves.decelerate,
        forwardAnimationCurve: Curves.elasticOut,)..show(context);
-       Navigator.of(context).push(MaterialPageRoute(builder: (context) =>Home()));
+     Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>Home()));
      //Navigator.pushNamed(context, homePage);
    }
    else{

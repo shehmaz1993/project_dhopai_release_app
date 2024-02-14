@@ -243,7 +243,7 @@ class OrderTrackProvider extends ChangeNotifier{
     if(map!['data']['order']!=null){
       setAmount(map!['data']['order']['amount']);
       print(amount);
-      setDiscount(map!['data']['order']['discount']==null||map!['data']['order']['discount']=='0'?0:map!['data']['order']['discount']);
+      setDiscount(map!['data']['order']['discount']==null||map!['data']['order']['discount']==0?0:map!['data']['order']['discount']);
       print(discount);
       setPickUp(map!['data']['order']['pickup_address']);
       print(pickUp);

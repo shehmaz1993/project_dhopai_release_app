@@ -72,7 +72,6 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
   loadNumberOfProduct()async{
     print('inside load number function');
     countProduct= await repo.countProduct();
-    print(countProduct);
     setState(()  {
 
     });
@@ -132,6 +131,11 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
 
   }
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  @override
   bool get wantKeepAlive => true;
 
   @override
@@ -153,7 +157,8 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
             onPressed:subTotal!=0?(){
               // Navigator.of(context).push(MaterialPageRoute(builder: (context) => CashMemo(total:total)));
               // Navigator.pushNamed(context, cashMemo,arguments: total);
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  PersonalInformation()));
+             // Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  PersonalInformation()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>PersonalInformation()));
             }:null,
             icon: Icon(Icons.arrow_right_alt_outlined,size: SizeConfig.blockSizeVertical*4.5,color: Colors.white,),
             label: Text('Sub total: ৳$subTotal',style: TextStyle(color: Colors.white),),

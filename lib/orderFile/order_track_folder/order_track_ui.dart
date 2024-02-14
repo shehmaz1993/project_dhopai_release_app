@@ -19,9 +19,9 @@ class _OrderTrackUIState extends State<OrderTrackUI>with AutomaticKeepAliveClien
     final OrderTrackProvider info = Provider.of<OrderTrackProvider>(context, listen: false);
     var a,b,c;
     setState(() {
-      a =  (double.parse('${info.amount.toString()}'));
-      b =  (double.parse('${info.charge.toString()}'));
-      c =  (double.parse('${info.discount.toString()}'));
+      a =  (double.tryParse('${info.amount}'));
+      b =  (double.tryParse('${info.charge}'));
+      c =  (double.tryParse('${info.discount}'));
       total = a+b-c;
     });
   }
@@ -52,7 +52,9 @@ class _OrderTrackUIState extends State<OrderTrackUI>with AutomaticKeepAliveClien
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             color: Colors.white,
-            onPressed: ()=>{Navigator.pop(context)},
+            onPressed: ()=>{
+              Navigator.pop(context)
+            },
           ),
         ),
       ),

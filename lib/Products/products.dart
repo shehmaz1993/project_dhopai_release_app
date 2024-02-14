@@ -254,7 +254,8 @@ class _ProductListState extends State<ProductList> with AutomaticKeepAliveClient
                             ),
                             child: GestureDetector(
                               onTap: (){
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchProduct()));
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>SearchProduct()));
+                              //  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchProduct()));
                               },
                               child: Container(
                                 height: SizeConfig.blockSizeVertical*5.8,
@@ -458,7 +459,8 @@ class _ProductListState extends State<ProductList> with AutomaticKeepAliveClient
                                                   }
                                                   else{
                                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SignInPage()));
+                                                   // Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SignInPage()));
+                                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>SignInPage()));
                                                   }
 
                                                 },

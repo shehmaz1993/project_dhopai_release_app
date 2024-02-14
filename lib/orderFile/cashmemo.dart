@@ -272,13 +272,12 @@ class _CashMemoState extends State<CashMemo> with AutomaticKeepAliveClientMixin<
               onTap: () async {
                 //repo.deliveryInfo();
                 if(selectedMethod==true){
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) =>PaymentOrder(
+
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>PaymentOrder(
                     deliveryType:deliveryType,
                     time:time,
                     deliveryCharge:deliveryAmount,
-                  )
-                  )
-                  );
+                  )));
                 }
               },
               child: Container(

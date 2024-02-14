@@ -52,6 +52,13 @@ class OrderConfirmationUI extends StatelessWidget {
                   onPressed: () async {
                     SharedPreferences prefs =await SharedPreferences.getInstance();
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) =>OrderTrackUI(orderId: prefs.getInt('current_order_id'),)));
+                  /*  Navigator.pushReplacement(
+                        context, MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            OrderTrackUI(
+                                orderId: prefs.getInt('current_order_id')
+                            )
+                    ));*/
                     },
                   child: FittedBox(
                       child: Padding(

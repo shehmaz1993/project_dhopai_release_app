@@ -35,7 +35,7 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
   Map<String,dynamic>? map;
   int i=0;
   bool _canPop = false;
-
+  final _formKey = GlobalKey<FormState>();
 
 
 
@@ -166,60 +166,65 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
         drawer: Drawer(
           child: MainSideBar(),
         ),
-        bottomNavigationBar: GestureDetector(
-          onTap:() async {
-            final infoOfDelivery  = Provider.of<DeliveryInfo>(context,listen:false);
-             SharedPreferences prefs = await SharedPreferences.getInstance();
-             prefs.setInt( 'delivery_area_id',infoOfDelivery.selectedAreaId!);
+        bottomNavigationBar: Consumer<DeliveryInfo>(
 
-            var info=await repo.updateDeliveryAddress(
-                infoOfDelivery.selectedAreaId!,
-                infoOfDelivery.selectedZoneId!,
-                1,
-                infoOfDelivery.street,
-                infoOfDelivery.city,//cityController.text.toString(),
-                infoOfDelivery.postCode// postcodeController.text.toString()
-            );
+          builder: (BuildContext context, DeliveryInfo value, Widget? child) {
 
-            if(info['success']==true){
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) =>CashMemo())
-              );
-            }
-            else{
-              Fluttertoast.showToast(msg:"Something went wrong!");
-            }
+            return GestureDetector(
+              onTap:() async {
+               // final infoOfDelivery  = Provider.of<DeliveryInfo>(context,listen:false);
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setInt( 'delivery_area_id',value.selectedAreaId!);
+
+                var info=await repo.updateDeliveryAddress(
+                    value.selectedAreaId!,
+                    value.selectedZoneId!,
+                    1,
+                    value.street,
+                    value.city,//cityController.text.toString(),
+                    value.postCode// postcodeController.text.toString()
+                );
+
+                if(info['success']==true){
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) =>CashMemo())
+                  );
+                }
+                else{
+                  Fluttertoast.showToast(msg:"Something went wrong!");
+                }
 
 
 
 
-            EasyLoading.dismiss();
-          },
-          child: Container(
-            height: SizeConfig.blockSizeVertical*6,
-            width: double.infinity,
-            color: Colors.indigo.shade700,
-            child: Row(
-              children: [
-                SizedBox(width: SizeConfig.blockSizeHorizontal*7,),
-                Container(
-                  height: SizeConfig.blockSizeVertical*5,
-                  width: SizeConfig.blockSizeHorizontal*83,
+                EasyLoading.dismiss();
+              },
+              child: Container(
+                height: SizeConfig.blockSizeVertical*6,
+                width: double.infinity,
+                color: Colors.indigo.shade700,
+                child: Row(
+                  children: [
+                    SizedBox(width: SizeConfig.blockSizeHorizontal*7,),
+                    Container(
+                      height: SizeConfig.blockSizeVertical*5,
+                      width: SizeConfig.blockSizeHorizontal*83,
 
-                  child: Center(
-                    child:
-                    Text('Next',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2.3,fontWeight: FontWeight.bold),),
-                  ),
+                      child: Center(
+                        child:
+                        Text('Next',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2.3,fontWeight: FontWeight.bold),),
+                      ),
+                    ),
+
+                    // SizedBox(width: SizeConfig.blockSizeHorizontal*1,),
+                    Icon(Icons.arrow_forward_ios,color: Colors.white,size: SizeConfig.blockSizeVertical*3,)
+
+                  ],
                 ),
 
-                // SizedBox(width: SizeConfig.blockSizeHorizontal*1,),
-                Icon(Icons.arrow_forward_ios,color: Colors.white,size: SizeConfig.blockSizeVertical*3,)
-
-              ],
-            ),
-
-          ),
-        ),
+              ),
+            );
+          },),
         body: ListView(
           children: [
             /* Padding(
@@ -242,7 +247,7 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
     );
   }
   Widget addressModification(){
-    final infoOfDelivery  = Provider.of<DeliveryInfo>(context);
+   // final infoOfDelivery  = Provider.of<DeliveryInfo>(context);
     return Padding(
         padding:  EdgeInsets.only(
             top:SizeConfig.blockSizeVertical*2,
@@ -267,6 +272,7 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
               color: Colors.grey.shade100,
             ),
             child: Consumer<DeliveryInfo>(
+              key: _formKey,
               builder: (context,value,child) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,8 +378,8 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
                                             print('Zones are ${value.zones}');
                                           }
                                         }
-                                        print(infoOfDelivery.selectedAreaName);
-                                        print(infoOfDelivery.selectedAreaId);
+                                        print(value.selectedAreaName);
+                                        print(value.selectedAreaId);
                                         print(value.zones);
                                         print('service area id ${value.selectedAreaId}');
                                         value.setIsSelectedArea(true);
@@ -467,8 +473,8 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
                                       ),
 
                                     ),
-                                    onChanged: infoOfDelivery.setCity,
-                                    onSubmitted: infoOfDelivery.setCity,
+                                    onChanged: value.setCity,
+                                    onSubmitted: value.setCity,
 
                                   ),
                                 ),
@@ -504,8 +510,8 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
                                           top: SizeConfig.blockSizeVertical*0.12
                                       ),
                                     ),
-                                    onChanged: infoOfDelivery.setPostCode,
-                                    onSubmitted: infoOfDelivery.setPostCode,
+                                    onChanged: value.setPostCode,
+                                    onSubmitted: value.setPostCode,
                                   ),
                                 ),
 
@@ -538,8 +544,8 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
                                         border: InputBorder.none,
                                         hintText: 'Enter address'
                                     ),
-                                    onChanged: infoOfDelivery.setStreet,
-                                    onSubmitted: infoOfDelivery.setStreet,
+                                    onChanged: value.setStreet,
+                                    onSubmitted: value.setStreet,
                                   ),
                                 ),
 
@@ -549,7 +555,7 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
                         ),
                       ],
                     ),
-                    infoOfDelivery.isSelectedArea==true?SizedBox(height: SizeConfig.blockSizeVertical*3,):SizedBox(height: SizeConfig.blockSizeVertical*8,),
+                    value.isSelectedArea==true?SizedBox(height: SizeConfig.blockSizeVertical*3,):SizedBox(height: SizeConfig.blockSizeVertical*8,),
 
 
                   ],

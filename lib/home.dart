@@ -38,7 +38,9 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
     'assets/images/wash1.png',
     'assets/images/wash1.png',
   ];
-
+  final _serviceKey = GlobalKey();
+  final _adKey = GlobalKey();
+  final _historyKey = GlobalKey();
   Future<List<dynamic>> fetchServices() async {
     String url=Helper.BASE_URL+Helper.extDefault+'services';
     var result = await http.get(Uri.parse(url));
@@ -79,9 +81,9 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
   }
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
     _controller2.dispose();
+    super.dispose();
+
   }
   @override
   bool get wantKeepAlive => true;
@@ -155,7 +157,8 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
                     ),
                     child: GestureDetector(
                       onTap: (){
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchProduct()));
+                      //  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchProduct()));
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>SearchProduct()));
                       },
                       child: Container(
                         height: SizeConfig.blockSizeVertical*5,
@@ -198,6 +201,7 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
               height:SizeConfig.blockSizeVertical*28 ,
               width: double.maxFinite,
               child: FutureBuilder(
+                   key: _serviceKey,
                   future: response,
                   builder: (BuildContext context,AsyncSnapshot snapshot){
                     if(snapshot.hasData){
@@ -240,6 +244,7 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
             ),
 
             FutureBuilder<PromotionModel>(
+                key: _adKey,
                 future:_repo.getAds() ,
                 builder:(BuildContext context,AsyncSnapshot<PromotionModel> snapshot){
                   if(snapshot.hasData){
@@ -360,7 +365,8 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
       padding:  EdgeInsets.only(left:SizeConfig.blockSizeHorizontal*3.08),
       child: GestureDetector(
         onTap: (){
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductList(index)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>ProductList(index)));
+          //Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductList(index)));
         },
         child: Card(
           elevation: 3,
@@ -405,6 +411,7 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
 
   Widget generateOrderList(){
     return  FutureBuilder<List<TopOrders>>(
+        key: _historyKey,
         future:_repo.getLatest5Orders(),
         builder: (BuildContext context,AsyncSnapshot<List<TopOrders>> snapshot){
           if(snapshot.connectionState == ConnectionState.done){
@@ -451,7 +458,8 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
       ),
       child: InkWell(
         onTap: (){
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) =>OrderTrackUI(orderId:id)));
+         // Navigator.of(context).push(MaterialPageRoute(builder: (context) =>OrderTrackUI(orderId:id)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>OrderTrackUI(orderId:id)));
         },
         child: Card(
           elevation: 2,

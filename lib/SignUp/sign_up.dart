@@ -8,15 +8,11 @@ import 'package:dhopai/utils/scaffold_message.dart';
 import 'package:dhopai/utils/utils.dart';
 import 'package:dhopai/widgets/webview_page.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 //import 'user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Repository/log_debugger.dart';
 import '../authentication/Reset_password/sms_verification.dart';
-import '../home.dart';
 import '../utils/Size.dart';
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -25,11 +21,12 @@ class SignUpPage extends StatefulWidget {
   State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateMixin {
   bool checkedValue = false;
   bool showPassword=false;
   bool showRePassword=false;
   Repository repo =Repository();
+  late AnimationController _controller;
   bool state = false;
   final List<Icon> iconsImage = [
     Icon(Icons.person),
@@ -43,17 +40,21 @@ class _SignUpPageState extends State<SignUpPage> {
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
   var confirmPassController = TextEditingController();
-  DBHelper? dbHelper;
+  //DBHelper? dbHelper;
 
   @override
   void initState() {
     final SignUpInfo infoOfSignUp = Provider.of<SignUpInfo>(
         context, listen: false);
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 7),
+    )..repeat();
     super.initState();
     nameController = TextEditingController(text: infoOfSignUp.name);
     phoneController = TextEditingController(text: infoOfSignUp.phoneNumber);
     emailController = TextEditingController(text: infoOfSignUp.email);
-    dbHelper=DBHelper();
+   // dbHelper=DBHelper();
   }
 
 
@@ -64,10 +65,12 @@ class _SignUpPageState extends State<SignUpPage> {
     emailController.dispose();
     passwordController.dispose();
     confirmPassController.dispose();
+    _controller.dispose();
+
     super.dispose();
   }
   //password
-  Future<bool>  registerInfo(String phoneNumber,String password) async {
+ /* Future<bool>  registerInfo(String phoneNumber,String password) async {
     print('inside function');
     final response = await http.post(
         Uri.parse('https://api.dhopai.com/api-customer/register'),
@@ -121,7 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
     on Exception {
       rethrow;
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -379,7 +382,9 @@ class _SignUpPageState extends State<SignUpPage> {
                 right:  SizeConfig.blockSizeHorizontal*7
             ),
             child: state == true? Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                value: _controller.value,
+              ),
             ): Container(
               width: SizeConfig.blockSizeHorizontal*30, //266.0,
               height: SizeConfig.blockSizeVertical*6.2,

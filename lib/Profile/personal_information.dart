@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
+import '../Products/search_product.dart';
 import '../Side_Navigator/main_side_bar.dart';
 import '../utils/Size.dart';
 
@@ -26,6 +27,8 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
   var lastNameController = TextEditingController();
   var phoneController = TextEditingController();
   Repository rp =Repository();
+
+  final _debouncer = Debouncer();
   @override
   void initState() {
     final PersonalUpdateInfo infoOfPerson = Provider.of<PersonalUpdateInfo>(context, listen: false);
@@ -35,7 +38,6 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
       firstNameController=TextEditingController(text: infoOfPerson.firstName);
       lastNameController=TextEditingController(text: infoOfPerson.lastName);
     });
-    // TODO: implement initState
     super.initState();
 
   }
@@ -45,6 +47,7 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
+
       appBar: AppBar(
           automaticallyImplyLeading: false,
           title:Text('Billing',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2.9),),
@@ -85,19 +88,18 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
                 lastNameController.text.toString()
             );
             if(response=='Customer update successfully.'){
-              Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          AddressModificationPickUpUpdate()));
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(
+                  builder: (BuildContext context) =>AddressModificationPickUpUpdate()
+              )
+              );
+
             }else{
               Fluttertoast.showToast(
                   msg: 'Something went wrong'
               );
             }
           }
-
-
-
 
         },
         child: Container(
@@ -196,27 +198,62 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
   }
   Widget phoneNumberTextBox() {
     SizeConfig().init(context);
-    final infoOfPerson  = Provider.of<PersonalUpdateInfo>(context);
-    return Container(
-      width: SizeConfig.blockSizeHorizontal*90, //266.0,
-      height: SizeConfig.blockSizeVertical*6.2, //48.0,
+    //final infoOfPerson  = Provider.of<PersonalUpdateInfo>(context);
+    return Consumer<PersonalUpdateInfo>(
 
-      color: Colors.white,
-      child: Padding(
-          padding:  EdgeInsets.only(
-            left:SizeConfig.blockSizeHorizontal*2.4,
-            top: SizeConfig.blockSizeVertical*1.3,
-            bottom: SizeConfig.blockSizeVertical*1.3,
-          ),
-          child: Text(infoOfPerson.phoneNumber??'',)
-      ),
-      // ),
-    );
+       builder: (BuildContext context, PersonalUpdateInfo value, Widget? child) {
+         return Container(
+           width: SizeConfig.blockSizeHorizontal*90, //266.0,
+           height: SizeConfig.blockSizeVertical*6.2, //48.0,
+
+           color: Colors.white,
+           child: Padding(
+               padding:  EdgeInsets.only(
+                 left:SizeConfig.blockSizeHorizontal*2.4,
+                 top: SizeConfig.blockSizeVertical*1.3,
+                 bottom: SizeConfig.blockSizeVertical*1.3,
+               ),
+               child: Text(value.phoneNumber??'',)
+           ),
+           // ),
+         );
+
+       },);
+
   }
   Widget firstNameTextBox(){
     SizeConfig().init(context);
-    final infoOfPerson  = Provider.of<PersonalUpdateInfo>(context);
-    return Container(
+    //final infoOfPerson  = Provider.of<PersonalUpdateInfo>(context);
+    return Consumer<PersonalUpdateInfo>(
+
+      builder: (BuildContext context, PersonalUpdateInfo value, Widget? child) {
+        return Container(
+          width: SizeConfig.blockSizeHorizontal*90, //266.0,
+          height: SizeConfig.blockSizeVertical*6.2, //48.0,
+
+          color: Colors.white,
+          child: Padding(
+            padding:  EdgeInsets.only(
+              left:SizeConfig.blockSizeHorizontal*2,
+              //  top: SizeConfig.blockSizeVertical*0.7,
+              bottom: SizeConfig.blockSizeVertical*1.0,
+            ),
+            child: TextField(
+              controller: firstNameController,
+              decoration:  InputDecoration(
+                  border: InputBorder.none
+              ),
+
+              onChanged:_debouncer.run(() {value.setFirstName;}),
+              onSubmitted:_debouncer.run(() {value.setFirstName;}),
+
+            ),
+          ),
+          //),
+        );
+
+      },);
+    /*Container(
       width: SizeConfig.blockSizeHorizontal*90, //266.0,
       height: SizeConfig.blockSizeVertical*6.2, //48.0,
 
@@ -239,37 +276,38 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
         ),
       ),
       //),
-    );
+    );*/
   }
   Widget lastNameTextBox(){
     SizeConfig().init(context);
-    final infoOfPerson  = Provider.of<PersonalUpdateInfo>(context);
-    return  Container(
-      width: SizeConfig.blockSizeHorizontal*90, //266.0,
-      height: SizeConfig.blockSizeVertical*6.2,
-      color: Colors.white,
+    //final infoOfPerson  = Provider.of<PersonalUpdateInfo>(context);
+    return  Consumer<PersonalUpdateInfo>(
 
-      child: Padding(
-        padding:  EdgeInsets.only(
-          left:SizeConfig.blockSizeHorizontal*2,
-          // top: SizeConfig.blockSizeVertical*1.0,
-          bottom: SizeConfig.blockSizeVertical*1.0,
-        ),
-        child: TextField(
-          controller: lastNameController,
-          decoration:  InputDecoration(
+      builder: (BuildContext context, PersonalUpdateInfo value, Widget? child) {
+        return Container(
+          width: SizeConfig.blockSizeHorizontal*90, //266.0,
+          height: SizeConfig.blockSizeVertical*6.2,
+          color: Colors.white,
 
-              border: InputBorder.none
+          child: Padding(
+            padding:  EdgeInsets.only(
+              left:SizeConfig.blockSizeHorizontal*2,
+              // top: SizeConfig.blockSizeVertical*1.0,
+              bottom: SizeConfig.blockSizeVertical*1.0,
+            ),
+            child: TextField(
+              controller: lastNameController,
+              decoration:  InputDecoration(
+                  border: InputBorder.none
+              ),
 
+              onChanged:value.setLastName,
+              onSubmitted:value.setLastName,
 
+            ),
           ),
-
-          onChanged:infoOfPerson.setLastName,
-          onSubmitted:infoOfPerson.setLastName,
-
-        ),
-      ),
-      // ),
-    );
+          // ),
+        );
+      },);
   }
 }
