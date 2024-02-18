@@ -36,7 +36,9 @@ class OrderTrackProvider extends ChangeNotifier{
   String? _pickUp;
   String? _delivery;
   String? _hPrice;
+  String? _total;
   int? get id =>_id;
+  String? get total => _total;
   String? get ref => _ref;
   String? get orderId => _orderId;
   String? get staffIdp => _staffIdP;
@@ -169,6 +171,10 @@ class OrderTrackProvider extends ChangeNotifier{
     _rphone = phone;
     notifyListeners();
   }
+  setTotal(String amount,String charge,String discount){
+    _total = (double.parse(amount) +double.parse(charge)-double.parse(discount)).toString();
+    notifyListeners();
+  }
   String formatDateTime(String date){
     var parsedDate = DateTime.parse(date);
     String formattedDate = DateFormat.yMMMEd().format(parsedDate);
@@ -243,12 +249,15 @@ class OrderTrackProvider extends ChangeNotifier{
     if(map!['data']['order']!=null){
       setAmount(map!['data']['order']['amount']);
       print(amount);
+      setCharge(map!['data']['order']['charge']);
+      print(charge);
       setDiscount(map!['data']['order']['discount']==null||map!['data']['order']['discount']==0?0:map!['data']['order']['discount']);
       print(discount);
       setPickUp(map!['data']['order']['pickup_address']);
       print(pickUp);
       setDelivery(map!['data']['order']['delivery_address']);
       print(delivery);
+      setTotal(map!['data']['order']['amount'],map!['data']['order']['charge'],map!['data']['order']['discount']??'0');
     }
     print(map!['data']['items']);
     List<dynamic> ls = map!['data']['items'];

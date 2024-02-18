@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../Repository/log_debugger.dart';
 import '../Repository/repository.dart';
 import '../utils/Size.dart';
 import '../utils/helper_class.dart';
@@ -134,6 +135,7 @@ class _PaymentOrderState extends State<PaymentOrder> {
   }
   @override
   Widget build(BuildContext context) {
+    LogDebugger.instance.i('order details');
     SizeConfig().init(context);
     return Scaffold(
         resizeToAvoidBottomInset: true,
@@ -244,7 +246,10 @@ class _PaymentOrderState extends State<PaymentOrder> {
                 checkDiscountAdded=false;
               });
               prefs.remove('discount');
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>OrderConfirmationUI()));
+              //Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>OrderConfirmationUI()));
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) =>OrderConfirmationUI())
+              );
             }
             // Navigator.pushNamed(context, homePage);
 

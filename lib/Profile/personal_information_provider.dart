@@ -6,7 +6,7 @@ import '../Repository/repository.dart';
 
 class PersonalUpdateInfo extends ChangeNotifier{
   Map<String,dynamic>? map;
-  Repository _repo=Repository();
+
 
   String _phoneNumber='';
   String get phoneNumber => _phoneNumber;
@@ -28,6 +28,7 @@ class PersonalUpdateInfo extends ChangeNotifier{
   }
 
   Future updateInfo() async {
+    Repository _repo=Repository();
     try{
 
       final response  = await _repo.userInfo();

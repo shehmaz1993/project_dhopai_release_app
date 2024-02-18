@@ -17,6 +17,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:badges/badges.dart' as badges;
+import '../Repository/log_debugger.dart';
 import '../database/db-handlar.dart';
 import '../Side_Navigator/main_side_bar.dart';
 import '../orderFile/order_rev.dart';
@@ -124,6 +125,11 @@ class _ProductListState extends State<ProductList> with AutomaticKeepAliveClient
     timer.cancel();
     super.dispose();
   }
+  @override
+  void deactivate() {
+
+    super.deactivate();
+  }
   static const snackBar = SnackBar(
     content: Text('You need to log in first!'),
   );
@@ -131,207 +137,210 @@ class _ProductListState extends State<ProductList> with AutomaticKeepAliveClient
   bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
+    LogDebugger.instance.i('Products');
      super.build(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: FutureBuilder(
-          future: catagory,
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              for(int i=0;i<snapshot.data.length;i++){
-                cateList.add(snapshot.data[i]['name']);
-              }
-              return DefaultTabController(
-                length: snapshot.data.length,
-                initialIndex:widget.selectedPage,
-                child: Scaffold(
-                  bottomNavigationBar: GestureDetector(
-                    onTap: (){
-                      if(numberOfProduct>0){
-                        Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => OrderRev()));
-                        //  Navigator.pushNamed(context, orderRev);
-                      }
-                      else{
-                        Utils().toastMessage('You did not select any product');
-                      }
-                    },
-                    child: Container(
-                      height: SizeConfig.blockSizeVertical*6,
-                      width: double.infinity,
-                      color: Colors.indigo.shade700,
-                      child: Row(
-                        children: [
-                          SizedBox(width: SizeConfig.blockSizeHorizontal*37,),
-                          Padding(
-                            padding:  EdgeInsets.only(right:SizeConfig.blockSizeHorizontal*1.5),
-                            child: badges.Badge(
-                              badgeContent: Text(numberOfProduct.toString()),
-                              badgeAnimation: badges.BadgeAnimation.rotation(
-                                animationDuration:Duration(milliseconds: 300) ,
-                                //animationType: BadgeAnimationType.fade,
-                              ),
-                              child: Icon(Icons.shopping_basket, color: Colors.white,size: SizeConfig.blockSizeVertical*2.5,),
-                            ),
-                          ),
-                          Container(
-                            // color: Colors.blue,
-                            height: SizeConfig.blockSizeVertical*5,
-                            width: SizeConfig.blockSizeHorizontal*20,
-                            child: Center(
-                              child:
-                              Text('Confirm',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2.3,fontWeight: FontWeight.bold),),
-                            ),
-                          ),
+      body: tabBarAccordingToService()
 
-                          SizedBox(width: SizeConfig.blockSizeHorizontal*30,),
-                          // Icon(Icons.arrow_forward_ios,color: Colors.white,size: SizeConfig.blockSizeVertical*3,)
+    );
+  }
+  Widget tabBarAccordingToService(){
+    return FutureBuilder(
+        future: catagory,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.hasData) {
+            for(int i=0;i<snapshot.data.length;i++){
+              cateList.add(snapshot.data[i]['name']);
+            }
+            return DefaultTabController(
+              length: snapshot.data.length,
+              initialIndex:widget.selectedPage,
+              child: Scaffold(
+                bottomNavigationBar: GestureDetector(
+                  onTap: () async {
+                    if(numberOfProduct>0){
+                     await Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => OrderRev()));
+                      //  Navigator.pushNamed(context, orderRev);
+                    }
+                    else{
+                      Utils().toastMessage('You did not select any product');
+                    }
+                  },
+                  child: Container(
+                    height: SizeConfig.blockSizeVertical*6,
+                    width: double.infinity,
+                    color: Colors.indigo.shade700,
+                    child: Row(
+                      children: [
+                        SizedBox(width: SizeConfig.blockSizeHorizontal*37,),
+                        Padding(
+                          padding:  EdgeInsets.only(right:SizeConfig.blockSizeHorizontal*1.5),
+                          child: badges.Badge(
+                            badgeContent: Text(numberOfProduct.toString()),
+                            badgeAnimation: badges.BadgeAnimation.rotation(
+                              animationDuration:Duration(milliseconds: 300) ,
+                              //animationType: BadgeAnimationType.fade,
+                            ),
+                            child: Icon(Icons.shopping_basket, color: Colors.white,size: SizeConfig.blockSizeVertical*2.5,),
+                          ),
+                        ),
+                        Container(
+                          // color: Colors.blue,
+                          height: SizeConfig.blockSizeVertical*5,
+                          width: SizeConfig.blockSizeHorizontal*20,
+                          child: Center(
+                            child:
+                            Text('Confirm',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2.3,fontWeight: FontWeight.bold),),
+                          ),
+                        ),
 
-                        ],
-                      ),
+                        SizedBox(width: SizeConfig.blockSizeHorizontal*30,),
+                        // Icon(Icons.arrow_forward_ios,color: Colors.white,size: SizeConfig.blockSizeVertical*3,)
+
+                      ],
                     ),
                   ),
-                  drawer: Drawer(
-                    child: MainSideBar(),
-                  ),
-                  appBar: PreferredSize(
-                    preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical*23.5),
-                    child: AppBar(
-                      automaticallyImplyLeading: false,
-                      toolbarHeight: SizeConfig.blockSizeVertical*14.5,
-                      backgroundColor: Colors.indigo.shade500,
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Builder(builder: (BuildContext context)=>IconButton(
-                                onPressed:()=> Scaffold.of(context).openDrawer(),
-                                icon:  Icon(
-                                  Icons.menu,
-                                  color: Colors.white,
-                                  size: SizeConfig.blockSizeVertical*4,
-                                ),
-                              ),),
-                              SizedBox(width: SizeConfig.blockSizeHorizontal*6,),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Home',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: SizeConfig.blockSizeVertical*2.5
-                                    ),
+                ),
+                drawer: Drawer(
+                  child: MainSideBar(),
+                ),
+                appBar: PreferredSize(
+                  preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical*23.5),
+                  child: AppBar(
+                    automaticallyImplyLeading: false,
+                    toolbarHeight: SizeConfig.blockSizeVertical*14.5,
+                    backgroundColor: Colors.indigo.shade500,
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Builder(builder: (BuildContext context)=>IconButton(
+                              onPressed:()=> Scaffold.of(context).openDrawer(),
+                              icon:  Icon(
+                                Icons.menu,
+                                color: Colors.white,
+                                size: SizeConfig.blockSizeVertical*4,
+                              ),
+                            ),),
+                            SizedBox(width: SizeConfig.blockSizeHorizontal*6,),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Home',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: SizeConfig.blockSizeVertical*2.5
                                   ),
+                                ),
+                                Text(
+                                  area??'Kuril',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: SizeConfig.blockSizeVertical*2.0
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(width: SizeConfig.blockSizeHorizontal*49,),
+                            badges.Badge(
+                                badgeContent: Text(numberOfProduct.toString()),
+                                badgeAnimation: badges.BadgeAnimation.rotation(
+                                  animationDuration:Duration(milliseconds: 300) ,
+                                ),
+                                child: Icon(
+                                    Icons.shopping_basket,
+                                    color: Colors.white,
+                                    size: SizeConfig.blockSizeVertical*4
+                                )
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding:EdgeInsets.only(
+                              left: SizeConfig.blockSizeHorizontal*7,
+                              top: SizeConfig.blockSizeVertical*0.2
+                          ),
+                          child: GestureDetector(
+                            onTap: (){
+                              //Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>SearchProduct()));
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchProduct()));
+                            },
+                            child: Container(
+                              height: SizeConfig.blockSizeVertical*5.8,
+                              width: SizeConfig.blockSizeHorizontal*80,
+
+                              decoration: BoxDecoration(
+                                borderRadius:   BorderRadius.circular(10),
+                                color: Colors.white,
+                              ),
+                              child: Row(
+                                children: [
+                                  SizedBox(width: SizeConfig.blockSizeHorizontal*3,),
+                                  Icon(Icons.search,size: SizeConfig.blockSizeVertical*3.2,color: Colors.black,),
+                                  SizedBox(width: SizeConfig.blockSizeHorizontal*3,),
                                   Text(
-                                    area??'Kuril',
+                                    'Search services and clothes',
                                     style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: SizeConfig.blockSizeVertical*2.0
+                                        color: Colors.black45,
+                                        fontSize: SizeConfig.blockSizeVertical*1.7
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(width: SizeConfig.blockSizeHorizontal*49,),
-                              badges.Badge(
-                                  badgeContent: Text(numberOfProduct.toString()),
-                                  badgeAnimation: badges.BadgeAnimation.rotation(
-                                    animationDuration:Duration(milliseconds: 300) ,
-                                  ),
-                                  child: Icon(
-                                      Icons.shopping_basket,
-                                      color: Colors.white,
-                                      size: SizeConfig.blockSizeVertical*4
-                                  )
-                              ),
-                            ],
+                            ),
                           ),
-                          Padding(
-                            padding:EdgeInsets.only(
-                                left: SizeConfig.blockSizeHorizontal*7,
-                                top: SizeConfig.blockSizeVertical*0.2
-                            ),
-                            child: GestureDetector(
-                              onTap: (){
-                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>SearchProduct()));
-                              //  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchProduct()));
-                              },
-                              child: Container(
-                                height: SizeConfig.blockSizeVertical*5.8,
-                                width: SizeConfig.blockSizeHorizontal*80,
+                        )
+                      ],
+                    ),
 
-                                decoration: BoxDecoration(
-                                  borderRadius:   BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                child: Row(
-                                  children: [
-                                    SizedBox(width: SizeConfig.blockSizeHorizontal*3,),
-                                    Icon(Icons.search,size: SizeConfig.blockSizeVertical*3.2,color: Colors.black,),
-                                    SizedBox(width: SizeConfig.blockSizeHorizontal*3,),
-                                    Text(
-                                      'Search services and clothes',
-                                      style: TextStyle(
-                                          color: Colors.black45,
-                                          fontSize: SizeConfig.blockSizeVertical*1.7
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
+                    bottom: PreferredSize(
+                      preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical*2),
+                      child: ColoredBox(
+                        color: Colors.white,
+                        child: Container(
+                          height: SizeConfig.blockSizeVertical*7,
+                          child: TabBar(
 
-                      bottom: PreferredSize(
-                        preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical*2),
-                        child: ColoredBox(
-                          color: Colors.white,
-                          child: Container(
-                            height: SizeConfig.blockSizeVertical*7,
-                            child: TabBar(
+                            labelColor: Colors.black,
+                            indicatorColor: Colors.indigo.shade800,
+                            unselectedLabelColor: Colors.black,
 
-                              labelColor: Colors.black,
-                              indicatorColor: Colors.indigo.shade800,
-                              unselectedLabelColor: Colors.black,
-
-                              tabs: List<Widget>.generate(
-                                  snapshot.data.length, (int index) {
-                                return Tab(text: snapshot.data[index]['name']);
-                              }),
-                            ),
+                            tabs: List<Widget>.generate(
+                                snapshot.data.length, (int index) {
+                              return Tab(text: snapshot.data[index]['name']);
+                            }),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  body:  TabBarView(
+                ),
+                body:  TabBarView(
 
-                    children: List<Widget>.generate(
-                        snapshot.data.length, (index) =>
-                        buildPage(
-                            snapshot.data[index]['id'],snapshot.data[index]['name']
-                        )
-                      // buildPageForMan(snapshot.data[index]['name'])
-                    ),
+                  children: List<Widget>.generate(
+                      snapshot.data.length, (index) =>
+                      buildPage(
+                          snapshot.data[index]['id'],snapshot.data[index]['name']
+                      )
+                    // buildPageForMan(snapshot.data[index]['name'])
                   ),
                 ),
-              );
-            }
-
-            else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+              ),
+            );
           }
-      ),
 
+          else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        }
     );
   }
-
 
   Widget buildPage(int service_id,String cata_name){
 
@@ -459,8 +468,8 @@ class _ProductListState extends State<ProductList> with AutomaticKeepAliveClient
                                                   }
                                                   else{
                                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                                   // Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SignInPage()));
-                                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>SignInPage()));
+                                                  await  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SignInPage()));
+                                                  //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>SignInPage()));
                                                   }
 
                                                 },

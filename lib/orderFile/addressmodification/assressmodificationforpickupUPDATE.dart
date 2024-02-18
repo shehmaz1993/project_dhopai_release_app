@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import '../../Repository/log_debugger.dart';
 import '../../Repository/repository.dart';
 import '../../utils/Size.dart';
 
@@ -49,6 +50,10 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
 
   }
   @override
+  void deactivate() {
+    super.deactivate();
+  }
+  @override
   void dispose() {
     cityController.dispose();
     postcodeController.dispose();
@@ -59,6 +64,7 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
   bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
+    LogDebugger.instance.i('pickup_update_page');
     super.build(context);
     SizeConfig().init(context);
     return WillPopScope(
@@ -108,7 +114,10 @@ class _AddressModificationPickUpUpdateState extends State<AddressModificationPic
 
                 );
                 if(map['success']==true){
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>AddressModificationDeliveryUpdate()));
+                 // Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>AddressModificationDeliveryUpdate()));
+                  await  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) =>AddressModificationDeliveryUpdate())
+                  );
                 }else{
                   Fluttertoast.showToast(msg: 'Address did not updated!');
                 }

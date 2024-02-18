@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../Repository/log_debugger.dart';
 import '../utils/Size.dart';
 import '../Side_Navigator/main_side_bar.dart';
 import 'addressmodification/delivery_info.dart';
@@ -192,6 +193,7 @@ class _CashMemoState extends State<CashMemo> with AutomaticKeepAliveClientMixin<
   bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
+    LogDebugger.instance.i('cash memo');
     super.build(context);
     SizeConfig().init(context);
     return Scaffold(
@@ -272,12 +274,18 @@ class _CashMemoState extends State<CashMemo> with AutomaticKeepAliveClientMixin<
               onTap: () async {
                 //repo.deliveryInfo();
                 if(selectedMethod==true){
-
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>PaymentOrder(
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) =>PaymentOrder(
+                        deliveryType:deliveryType,
+                        time:time,
+                        deliveryCharge:deliveryAmount,
+                      ))
+                  );
+                 /* Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>PaymentOrder(
                     deliveryType:deliveryType,
                     time:time,
                     deliveryCharge:deliveryAmount,
-                  )));
+                  )));*/
                 }
               },
               child: Container(

@@ -27,6 +27,7 @@ class Repository {
 
 
   Future<bool> registerInfo(String phoneNumber, String password) async {
+    var client = http.Client();
     print('inside function');
     final response = await http.post(
         Uri.parse('https://api.dhopai.com/api-customer/register'),
@@ -67,10 +68,12 @@ class Repository {
           prefs.setString('phone', user_info!['data']['phone']);
           await FirebaseApi().enableNotification();
         }
-
+        client.close();
         return user_info!['success'];
+
       }
       else {
+        client.close();
         throw Exception('Request Error: ${response.statusCode}');
       }
     }
@@ -80,14 +83,17 @@ class Repository {
   }
 
   Future<List<dynamic>> fetchServices() async {
+    var client = http.Client();
     String url = Helper.BASE_URL + Helper.extDefault + 'services';
     var result = await http.get(Uri.parse(url));
+    client.close();
     return jsonDecode(result.body)['data'];
   }
 
   Future addCart(int customerId, int serviceId, int productId, int quantity,
       int price, String token, int hPrice) async {
     print('inside function');
+    var client = http.Client();
     //'7|kBR2OMnoO2nMafSSicOmKuJ6l31YFae51fm8Bwbz'
     //'https://api.dhopai.com/api-customer/cart_create'
     String url = Helper.BASE_URL + Helper.extCustomer + 'cart_create';
@@ -111,6 +117,7 @@ class Repository {
         print('api calling is successful......');
         var user_info = json.decode(response.body);
         print('cart data $user_info');
+        client.close();
       }
       else {
         throw Exception('Request Error: ${response.statusCode}');
@@ -122,6 +129,7 @@ class Repository {
   }
 
   Future<CartProductModel> getProducts() async {
+    var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String url = Helper.BASE_URL + Helper.extCustomer +
         'cart/${prefs.getInt('customer_id')}';
@@ -139,6 +147,7 @@ class Repository {
         print('api calling is successful......');
         var cart_info = json.decode(response.body);
         print('cart data $cart_info');
+        client.close();
         return CartProductModel.fromJson(cart_info);
       }
       else {
@@ -310,6 +319,7 @@ class Repository {
   Future<Map> updatePickUpAddress(int areaId, int zoneId, int labelId,
       String streetAddress, String city, String zip) async {
     print('in updating address method');
+    var client = http.Client();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print(prefs.getString('token'));
@@ -322,7 +332,7 @@ class Repository {
     print('zip $zip');*/
     String url = Helper.BASE_URL + Helper.extCustomer + 'pickup_address_update';
     // EasyLoading.show(status: 'loading...');
-    final response = await http.post(
+    final response = await client.post(
       Uri.parse(url),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -347,6 +357,7 @@ class Repository {
         print(' update pick up address data : $addressInfo');
         // log(addressInfo);
         //  Navigator.pop(context,true);
+        client.close();
         return addressInfo;
       }
       else {
@@ -603,6 +614,7 @@ class Repository {
         LogDebugger.instance.i(addressInfo);
         // log(addressInfo);
         EasyLoading.dismiss();
+        client.close();
         return addressInfo;
       }
       else {
@@ -937,11 +949,12 @@ class Repository {
 
   Future<Map<String, dynamic>> userInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    var client = http.Client();
     //'https://api.dhopai.com/api-customer/cart/${prefs.getInt('customer_id')}'
     String url = Helper.BASE_URL + Helper.extCustomer +
         'customer/${prefs.getInt('customer_id')}';
     print('userinfo is $url');
-    var response = await http.get(
+    var response = await client.get(
       Uri.parse(url),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -953,6 +966,7 @@ class Repository {
         print('api calling is successful......');
         var profileInfo = json.decode(response.body);
         print('User profile data $profileInfo');
+        client.close();
         return profileInfo;
       }
       else {

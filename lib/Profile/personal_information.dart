@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../Products/search_product.dart';
+import '../Repository/log_debugger.dart';
 import '../Side_Navigator/main_side_bar.dart';
 import '../utils/Size.dart';
 
@@ -28,7 +29,6 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
   var phoneController = TextEditingController();
   Repository rp =Repository();
 
-  final _debouncer = Debouncer();
   @override
   void initState() {
     final PersonalUpdateInfo infoOfPerson = Provider.of<PersonalUpdateInfo>(context, listen: false);
@@ -42,9 +42,18 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
 
   }
   @override
+  void dispose() {
+    super.dispose();
+  }
+  @override
+  void deactivate() {
+    super.deactivate();
+  }
+  @override
   bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
+    LogDebugger.instance.i('personal_info');
     super.build(context);
     return Scaffold(
 
@@ -88,11 +97,12 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
                 lastNameController.text.toString()
             );
             if(response=='Customer update successfully.'){
-              Navigator.pushReplacement(
+             /* Navigator.pushReplacement(
                   context, MaterialPageRoute(
                   builder: (BuildContext context) =>AddressModificationPickUpUpdate()
               )
-              );
+              );*/
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  AddressModificationPickUpUpdate()));
 
             }else{
               Fluttertoast.showToast(
@@ -244,8 +254,11 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
                   border: InputBorder.none
               ),
 
-              onChanged:_debouncer.run(() {value.setFirstName;}),
-              onSubmitted:_debouncer.run(() {value.setFirstName;}),
+            //  onChanged:_debouncer.run(() {value.setFirstName;}),
+              //onSubmitted:_debouncer.run(() {value.setFirstName;}),
+              onChanged: (value1){
+                value.setFirstName(value1);
+              },
 
             ),
           ),
@@ -301,8 +314,12 @@ class _PersonalInformationState extends State<PersonalInformation> with Automati
                   border: InputBorder.none
               ),
 
-              onChanged:value.setLastName,
-              onSubmitted:value.setLastName,
+              onChanged:(value1){
+                value.setLastName(value1);
+              },
+              onSubmitted:(value1){
+                value.setLastName(value1);
+              },
 
             ),
           ),

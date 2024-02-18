@@ -15,16 +15,17 @@ class OrderTrackUI extends StatefulWidget {
 
 class _OrderTrackUIState extends State<OrderTrackUI>with AutomaticKeepAliveClientMixin {
    var total;
-  countTotalWithDiscount(){
+  /*countTotalWithDiscount(){
     final OrderTrackProvider info = Provider.of<OrderTrackProvider>(context, listen: false);
     var a,b,c;
+    a =  (double.tryParse('${info.amount}'));
+    b =  (double.tryParse('${info.charge}'));
+    c =  (double.tryParse('${info.discount}'));
     setState(() {
-      a =  (double.tryParse('${info.amount}'));
-      b =  (double.tryParse('${info.charge}'));
-      c =  (double.tryParse('${info.discount}'));
-      total = a+b-c;
+
+      total = a + b - c;
     });
-  }
+  }*/
   @override
   void initState() {
     // TODO: implement initState
@@ -34,7 +35,7 @@ class _OrderTrackUIState extends State<OrderTrackUI>with AutomaticKeepAliveClien
     });
 
     super.initState();
-    countTotalWithDiscount();
+    //countTotalWithDiscount();
   }
    @override
    bool get wantKeepAlive => true;
@@ -606,7 +607,7 @@ class _OrderTrackUIState extends State<OrderTrackUI>with AutomaticKeepAliveClien
                           ),
                         ),
                         TextSpan(
-                          text: '৳${total}',
+                          text: '৳${info.total}',
                           style: TextStyle(
                               color: Colors.black54,
                               fontSize:SizeConfig.blockSizeVertical*1.8

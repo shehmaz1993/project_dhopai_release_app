@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../Repository/log_debugger.dart';
 import '../../Repository/repository.dart';
 import '../../Routing/constrants.dart';
 import '../../utils/Size.dart';
@@ -72,6 +73,10 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
     print('printed data ${infoOfDelivery.map}');
   }
   @override
+  void deactivate() {
+    super.deactivate();
+  }
+  @override
   void dispose() {
     // TODO: implement dispose
     cityController.dispose();
@@ -85,6 +90,7 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
   bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
+    LogDebugger.instance.i('delivery_update_page');
      super.build(context);
     SizeConfig().init(context);
     return WillPopScope(
@@ -186,7 +192,7 @@ class _AddressModificationDeliveryUpdateState extends State<AddressModificationD
                 );
 
                 if(info['success']==true){
-                  Navigator.of(context).push(
+                 await Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) =>CashMemo())
                   );
                 }

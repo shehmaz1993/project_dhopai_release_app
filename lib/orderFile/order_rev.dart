@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../Products/products.dart';
 import '../Profile/personal_information.dart';
+import '../Repository/log_debugger.dart';
 import '../utils/Size.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -28,7 +29,7 @@ class OrderRev extends StatefulWidget {
 class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin,AutomaticKeepAliveClientMixin<OrderRev> {
   Repository repo= Repository();
   List<int> indTotalPrice =[];
-
+  Future<CartProductModel>? response;
   List<dynamic> studList=[];
   late final AnimationController _controller;
   late final Animation<double> _animation;
@@ -49,6 +50,7 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
   void initState() {
     // TODO: implement initState
     super.initState();
+    response = repo.getProducts();
     loadingToken();
     loadNumberOfProduct();
     getTotalPriceProducts();
@@ -136,11 +138,17 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
     super.dispose();
   }
   @override
+  void deactivate() {
+    // TODO: implement deactivate
+    super.deactivate();
+  }
+  @override
   bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
     //  _loadData();
+    LogDebugger.instance.i('Order_rev');
     super.build(context);
     SizeConfig().init(context);
     return token!=null? Scaffold(
@@ -154,11 +162,11 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
           ),
           child:FloatingActionButton.extended(
             backgroundColor:subTotal!=0?Colors.indigo.shade700:Colors.grey.shade500,
-            onPressed:subTotal!=0?(){
+            onPressed:subTotal!=0?() async {
               // Navigator.of(context).push(MaterialPageRoute(builder: (context) => CashMemo(total:total)));
               // Navigator.pushNamed(context, cashMemo,arguments: total);
-             // Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  PersonalInformation()));
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>PersonalInformation()));
+               await Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  PersonalInformation()));
+             // Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>PersonalInformation()));
             }:null,
             icon: Icon(Icons.arrow_right_alt_outlined,size: SizeConfig.blockSizeVertical*4.5,color: Colors.white,),
             label: Text('Sub total: ৳$subTotal',style: TextStyle(color: Colors.white),),
@@ -190,558 +198,10 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
       body:countProduct!=0? ListView(
         children: [
 
-          FutureBuilder(
-              future:repo.getProducts(),
-              builder: (context,AsyncSnapshot<CartProductModel> snapshot){
-                if(snapshot.hasData){
-                  //  studList=snapshot.data!.data!;
-                  //totalPrice();
-                  createIndividualTotalPrice(snapshot.data!.data!.length);
-                  return ListView.builder(
-                      itemCount: snapshot.data!.data!.length,
-                      shrinkWrap: true,
-                      itemBuilder:(context,index){
-                        print(snapshot.data!.data![index].price);
 
-                        return Slidable(
-                          endActionPane: ActionPane(
-                            motion: const BehindMotion(),
+          SizedBox(height: SizeConfig.blockSizeVertical*1,),
+          listItems(),
 
-                            children: [
-                              SlidableAction(
-                                  icon: Icons.delete,
-                                  backgroundColor: Colors.redAccent,
-                                  label: 'delete',
-                                  onPressed: (context)async{
-                                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                                    for(int i=0;i<int.parse(snapshot.data!.data![index].quantity!) ;i++){
-                                      setState(() {
-                                        subTotal=subTotal-int.parse(snapshot.data!.data![index].price!)-int.parse(snapshot.data!.data![index].hPrice!);
-                                        prefs.setInt('subTotal', subTotal);
-                                        // total=subTotal-discount;
-                                      });
-                                      //   prefs.setInt('total', total);
-                                    }
-                                    await repo.deleteItem(snapshot.data!.data![index].id);
-                                    Utils().toastMessage('${snapshot.data!.data![index].product!.name.toString()} deleted ');
-
-                                    setState(() {
-                                      _loadData();
-                                    });
-                                  }
-                              )
-                            ],
-                          ),
-                          child: Card(
-                            color: Colors.white,
-                            elevation: 2,
-                            child: SizedBox(
-                              height:SizeConfig.blockSizeVertical*12.3, //90,
-                              width: double.infinity,
-                              //color: Colors.red,
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: SizeConfig.blockSizeVertical*10.6,
-                                    width:SizeConfig.blockSizeHorizontal*27, //110,
-                                    //color: Colors.lightBlue,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft:Radius.circular(7),
-                                          bottomLeft:Radius.circular(7)
-
-                                      ),
-                                      //color: Colors.cyan.shade700,
-                                    ),
-                                    child: CachedNetworkImage(
-                                      imageUrl: Helper.BASE_URL+snapshot.data!.data![index].product!.imagePath.toString(),
-                                      placeholder: (context, url) => CircularProgressIndicator(),
-                                      errorWidget: (context, url, error) => Icon(Icons.error),
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                  Column(
-                                    //mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        height: SizeConfig.blockSizeVertical*3.8,
-                                        width: SizeConfig.blockSizeHorizontal*47.2,
-                                        // color: Colors.black26,
-                                        child: Padding(
-                                            padding:  EdgeInsets.only(
-                                              left:SizeConfig.blockSizeHorizontal*2.6,
-                                              top: SizeConfig.blockSizeVertical*0.7,
-                                              // bottom: SizeConfig.blockSizeVertical*0.4
-                                            ),
-                                            child:Row(
-                                              children: [
-                                                Text(
-                                                  snapshot.data!.data![index].product!.name.toString(),
-                                                  style: TextStyle(fontSize: SizeConfig.blockSizeVertical*1.9,
-                                                      fontWeight: FontWeight.bold
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:  EdgeInsets.only(
-                                                      top:SizeConfig.blockSizeVertical*0.4,
-                                                      left: SizeConfig.blockSizeHorizontal*0.5
-                                                  ),
-                                                  child: Text.rich(
-                                                      TextSpan(
-                                                          text: '(',style:TextStyle(
-                                                        fontSize: SizeConfig.blockSizeVertical*1.8,
-                                                        // fontWeight: FontWeight.bold,
-                                                      ) ,
-                                                          children: <InlineSpan>[
-                                                            TextSpan(
-                                                              text: '৳',
-                                                              style: TextStyle(
-                                                                fontSize: SizeConfig.blockSizeVertical*1.7,
-                                                                //fontWeight: FontWeight.bold,
-                                                              ),
-                                                            ),
-                                                            TextSpan(
-                                                              text: snapshot.data!.data![index].price.toString(),
-                                                              style: TextStyle(
-                                                                  fontSize: SizeConfig.blockSizeVertical*1.7,
-                                                                  color: Colors.red
-                                                              ),
-
-                                                            ),
-                                                            TextSpan(
-                                                              text: ')',
-                                                              style: TextStyle(
-                                                                  fontSize: SizeConfig.blockSizeVertical*1.8,
-                                                                  // fontWeight: FontWeight.bold,
-                                                                  fontStyle: FontStyle.italic,
-                                                                  color: Colors.black45
-                                                              ),
-
-                                                            )
-                                                          ]
-                                                      )),
-                                                ),
-
-                                              ],
-                                            )
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: SizeConfig.blockSizeVertical*2.9,
-                                        width: SizeConfig.blockSizeHorizontal*42.2,
-                                        // color: Colors.green,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                            left:SizeConfig.blockSizeHorizontal*2.6,
-                                            top: SizeConfig.blockSizeVertical*0.7,
-                                            //  bottom: SizeConfig.blockSizeVertical*0.4
-
-                                          ),
-                                          child:snapshot.data!.data![index].service!=null?
-                                          RichText(
-                                            text: TextSpan(
-                                                text: snapshot.data!.data![index].service!.name.toString(),
-                                                style: TextStyle(
-                                                  fontSize: SizeConfig.blockSizeVertical*1.4,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: Colors.indigo.shade700,),
-                                                children: <TextSpan>[
-                                                  TextSpan(
-                                                    text: int.parse(snapshot.data!.data![index].hPrice.toString())!=0
-                                                        ?' (with Hanger ৳${snapshot.data!.data![index].hPrice} )':' ',
-                                                    style: TextStyle(
-                                                      fontSize: SizeConfig.blockSizeVertical*1.4,
-                                                      fontWeight: FontWeight.normal,),
-                                                  )
-                                                ]
-                                            ),
-                                          ):Text(''),
-
-                                          /*Text(
-                                              snapshot.data!.data![index].service!.name.toString(),
-                                              style: TextStyle(
-                                                  fontSize: SizeConfig.blockSizeVertical*2.0,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: Colors.lightBlue.shade700,
-                                                  fontStyle: FontStyle.italic),
-                                            ),*/
-                                        ),
-                                      ),
-                                      SizedBox(
-                                          height: SizeConfig.blockSizeVertical*4.2,
-                                          width: SizeConfig.blockSizeHorizontal*45.2,
-                                          //color: Colors.yellow,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                height: SizeConfig.blockSizeVertical*4.5,
-                                                width: SizeConfig.blockSizeHorizontal*42.2,
-                                                //color: Colors.lightBlue,
-                                                child: Center(
-                                                  child: Row(
-                                                    children: [
-                                                      SizedBox(width: SizeConfig.blockSizeHorizontal*1,),
-                                                      IconButton(
-                                                        onPressed: ()async{
-                                                          SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                          if(int.parse(snapshot.data!.data![index].quantity!)>1){
-                                                            await repo.updateQuantity(-1, snapshot.data!.data![index].id!);
-                                                            setState(() {
-                                                              //snapshot!.data!.data![index].quantity!;
-
-                                                              _loadData();
-                                                              subTotal=subTotal-int.parse(snapshot.data!.data![index].price!)-int.parse(snapshot.data!.data![index].hPrice!);
-                                                              indTotalPrice[index] = indTotalPrice[index] -int.parse(snapshot.data!.data![index].price!)-int.parse(snapshot.data!.data![index].hPrice!);
-
-                                                              //  total=subTotal-discount;
-
-                                                            });
-                                                            prefs.setInt('subTotal', subTotal);
-                                                            //  prefs.setInt('total', total);
-                                                            //EasyLoading.showSuccess('Updated!');
-                                                            EasyLoading.dismiss();
-
-                                                          }
-                                                          else{
-                                                            SharedPreferences prefs = await SharedPreferences.getInstance();
-
-
-                                                            setState(()  {
-
-                                                              for(int i=0;i< int.parse(snapshot.data!.data![index].quantity!);i++){
-                                                                subTotal=subTotal-int.parse(snapshot.data!.data![index].price!)-int.parse(snapshot.data!.data![index].hPrice!);
-                                                                // total=subTotal-discount;
-
-                                                              }
-
-                                                            });
-                                                            prefs.setInt('subTotal', subTotal);
-                                                            // prefs.setInt('total', total);
-                                                            await repo.deleteItem(snapshot.data!.data![index].id);
-                                                            _loadData();
-
-
-                                                          }
-
-
-                                                        },
-                                                        icon:Icon(Icons.remove_circle,color: Colors.indigo.shade400,size: SizeConfig.blockSizeVertical*4,), //Image.asset('assets/images/minus.png',),
-                                                      ),
-                                                      SizedBox(width: SizeConfig.blockSizeHorizontal*4,),
-                                                      Padding(
-                                                        padding:  EdgeInsets.only(top:SizeConfig.blockSizeVertical*1.5),
-                                                        child: Text(snapshot.data!.data![index].quantity!.toString(),style: TextStyle(fontWeight: FontWeight.bold),),
-                                                      ),
-                                                      SizedBox(width: SizeConfig.blockSizeHorizontal*4.5,),
-                                                      IconButton(
-                                                        onPressed: ()async{
-                                                          SharedPreferences prefs = await SharedPreferences.getInstance();
-
-                                                          await repo.updateQuantity( 1, snapshot.data!.data![index].id!);
-                                                          setState(() {
-
-                                                            _loadData();
-                                                            subTotal=subTotal+int.parse(snapshot.data!.data![index].price!)+int.parse(snapshot.data!.data![index].hPrice!);
-                                                            indTotalPrice[index] = indTotalPrice[index]+int.parse(snapshot.data!.data![index].price!)+int.parse(snapshot.data!.data![index].hPrice!);
-                                                            //total=subTotal-discount;
-
-                                                          });
-                                                          prefs.setInt('subTotal', subTotal);
-                                                          // prefs.setInt('total', total);
-
-                                                          // EasyLoading.dismiss();
-                                                        },
-                                                        icon:Icon(Icons.add_circle,color: Colors.indigo.shade400,size: SizeConfig.blockSizeVertical*4,), //Image.asset('assets/images/add.png'),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-
-                                            ],
-                                          )
-                                      ),
-
-                                    ],
-                                  ),
-
-                                  Container(
-                                      height: SizeConfig.blockSizeVertical*11.5,
-                                      width: SizeConfig.blockSizeHorizontal*23,
-                                      //color: Colors.grey,
-                                      child: Padding(
-                                        padding:  EdgeInsets.symmetric(
-                                            vertical: SizeConfig.blockSizeVertical*3.8
-                                        ),
-                                        child: Column(
-
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-
-                                            Text.rich(
-                                                TextSpan(
-                                                    text: 'total:',style:TextStyle(
-                                                    fontSize: SizeConfig.blockSizeVertical*2,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontStyle: FontStyle.italic,
-                                                    color:  Colors.black
-                                                ) ,
-                                                    children: <InlineSpan>[
-                                                      TextSpan(
-                                                        text: '৳',
-                                                        style: TextStyle(
-                                                            fontSize: SizeConfig.blockSizeVertical*2,
-                                                            fontWeight: FontWeight.bold,
-                                                            fontStyle: FontStyle.italic,
-                                                            color: Colors.black45
-                                                        ),
-                                                      ),
-                                                      TextSpan(
-                                                        text: indTotalPrice[index].toString(),
-                                                        style: TextStyle(
-                                                            fontSize: SizeConfig.blockSizeVertical*2,
-                                                            fontWeight: FontWeight.bold,
-                                                            fontStyle: FontStyle.italic,
-                                                            color: Colors.redAccent
-                                                        ),
-                                                      )
-                                                    ]
-                                                )),
-                                          ],
-                                        ),
-                                      )
-
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                  );
-                }
-
-
-                else{
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-
-                }
-              }
-
-          ),
-          SizedBox(height: SizeConfig.blockSizeVertical*3,),
-          /* Card(
-            elevation: 7,
-            child: SizedBox(
-                height: SizeConfig.blockSizeVertical*12,
-                width: double.infinity,
-                child:Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    Padding(
-                      padding: EdgeInsets.only(left:SizeConfig.blockSizeHorizontal*3,top: SizeConfig.blockSizeVertical*2.5),
-                      child: Container(
-                        height: SizeConfig.blockSizeVertical*6,
-                        width: SizeConfig.blockSizeHorizontal*60,
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black26)
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(left: SizeConfig.blockSizeHorizontal*4),
-                          child:  TextField(
-                            controller: promoController,
-                            decoration: InputDecoration(
-                                hintText: 'Enter promocode!...',
-                                border: InputBorder.none
-
-
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left:SizeConfig.blockSizeHorizontal*3,top: SizeConfig.blockSizeVertical*2.5),
-                      child: InkWell(
-                        onTap: () async {
-                          SharedPreferences prefs = await SharedPreferences.getInstance();
-                          bool info=await discountOfProduct();
-                          if(info==true){
-                            prefs.setInt('discount', discount);
-                            Utils().toastMessage('you got ৳${discount} discount!');
-
-                          }
-                          else{
-                            Utils().toastMessage(discountMessage);
-                            prefs.setInt('discount', 0);
-                          }
-                        },
-                        child: Container(
-                          height: SizeConfig.blockSizeVertical*6,
-                          width: SizeConfig.blockSizeHorizontal*30,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4.0),
-                            color: Colors.redAccent,
-                          ),
-                          child: const Center(child: FittedBox(child: Text('Use',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),))),
-                        ),
-                      ),
-                    )
-                  ],
-                )
-            ),
-          ),*/
-          /* Padding(
-            padding:  EdgeInsets.only(
-              left: SizeConfig.blockSizeHorizontal*8,
-              top: SizeConfig.blockSizeVertical*2,
-            ),
-            child: Row(
-              children: [
-                SizedBox(
-                  //color: Colors.red,
-                    height:SizeConfig.blockSizeVertical*6,
-                    width: SizeConfig.blockSizeHorizontal*60,
-                    child: Padding(
-                        padding: EdgeInsets.only(right: SizeConfig.blockSizeHorizontal*30,top: SizeConfig.blockSizeVertical*1),
-                        child: Text('Sub Total',style:TextStyle(fontSize: SizeConfig.blockSizeVertical*2.0,color: Colors.lightBlue)))),
-                SizedBox(width: SizeConfig.blockSizeHorizontal*10,),
-                Container(
-                  //color: Colors.yellow,
-                  height:SizeConfig.blockSizeVertical*3.9,
-                  width: SizeConfig.blockSizeHorizontal*21,
-                  child: Padding(
-                    padding:  EdgeInsets.only(left:SizeConfig.blockSizeHorizontal*5),
-                    child: Text('৳:$subTotal',style:TextStyle(fontSize: SizeConfig.blockSizeVertical*2.0,color: Colors.black54)),
-                  ),
-                )
-
-              ],
-            ),
-          ),
-          //Text('Sub Total',style: TextStyle(fontSize: SizeConfig.blockSizeVertical*3.0,color: Colors.lightBlue),),
-          //Text('${sum}/-')
-          Padding(
-            padding:  EdgeInsets.only(
-              left: SizeConfig.blockSizeHorizontal*8,
-              //top: SizeConfig.blockSizeVertical*1,
-            ),
-            child: Row(
-              children: [
-                SizedBox(
-                  //color: Colors.red,
-                    height:SizeConfig.blockSizeVertical*6,
-                    width: SizeConfig.blockSizeHorizontal*60,
-                    child: Padding(
-                        padding: EdgeInsets.only(right: SizeConfig.blockSizeHorizontal*30,top: SizeConfig.blockSizeVertical*1),
-                        child: Text('Shipping',style:TextStyle(fontSize: SizeConfig.blockSizeVertical*2.0,color: Colors.lightBlue)))),
-                SizedBox(width: SizeConfig.blockSizeHorizontal*10,),
-                Container(
-                  // color: Colors.yellow,
-                  height:SizeConfig.blockSizeVertical*3.9,
-                  width: SizeConfig.blockSizeHorizontal*21,
-                  child: Padding(
-                    padding:  EdgeInsets.only(left:SizeConfig.blockSizeHorizontal*5),
-                    child: Text('৳:0',style:TextStyle(fontSize: SizeConfig.blockSizeVertical*2.0,color: Colors.black54)),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Padding(
-            padding:  EdgeInsets.only(
-              left: SizeConfig.blockSizeHorizontal*8,
-              //top: SizeConfig.blockSizeVertical*1,
-            ),
-            child: Row(
-              children: [
-                SizedBox(
-                  //color: Colors.red,
-                    height:SizeConfig.blockSizeVertical*6,
-                    width: SizeConfig.blockSizeHorizontal*60,
-                    child: Padding(
-                        padding: EdgeInsets.only(right: SizeConfig.blockSizeHorizontal*30,top: SizeConfig.blockSizeVertical*1),
-                        child: Text('Discount',style:TextStyle(fontSize: SizeConfig.blockSizeVertical*2.0,color: Colors.lightBlue)))),
-                SizedBox(width: SizeConfig.blockSizeHorizontal*9,),
-                Container(
-                  // color: Colors.yellow,
-                  height:SizeConfig.blockSizeVertical*3.9,
-                  width: SizeConfig.blockSizeHorizontal*21,
-                  child: Padding(
-                    padding:  EdgeInsets.only(left:SizeConfig.blockSizeHorizontal*5),
-                    child: Text('-৳:${discount}',style:TextStyle(fontSize: SizeConfig.blockSizeVertical*2.0,color: Colors.black54)),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Padding(
-            padding:  EdgeInsets.only(
-              left: SizeConfig.blockSizeHorizontal*8,
-              //  top: SizeConfig.blockSizeVertical*.5,
-            ),
-            child: Row(
-              children: [
-                SizedBox(
-                  height:SizeConfig.blockSizeVertical*6,
-                  width: SizeConfig.blockSizeHorizontal*70,
-                  child: Padding(
-                    padding: EdgeInsets.only(right: SizeConfig.blockSizeHorizontal*30,top: SizeConfig.blockSizeVertical*1),
-                    child: Text('Payable amount',style:TextStyle(fontSize: SizeConfig.blockSizeVertical*2.0,color: Colors.lightBlue)),
-                  ),
-                ),
-                //SizedBox(width: SizeConfig.blockSizeHorizontal*1,),
-                Container(
-                  // color: Colors.yellow,
-                  height:SizeConfig.blockSizeVertical*3.9,
-                  width: SizeConfig.blockSizeHorizontal*21,
-                  child: Padding(
-                    padding:  EdgeInsets.only(left:SizeConfig.blockSizeHorizontal*5),
-                    child: Text('৳:$total',style:TextStyle(fontSize: SizeConfig.blockSizeVertical*2.0,color: Colors.black54)),
-                  ),
-                )
-
-              ],
-            ),
-          ),*/
-          SizedBox(height: SizeConfig.blockSizeVertical*10,)
-          /*  Padding(
-             padding:  EdgeInsets.only(
-                 left: SizeConfig.blockSizeHorizontal*8,
-                 right: SizeConfig.blockSizeVertical*4,
-                 top: SizeConfig.blockSizeVertical*3,
-                 bottom: SizeConfig.blockSizeVertical*3
-             ),
-             child: InkWell(
-               onTap: (){
-                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => CashMemo(total:total)));
-               },
-               child: Container(
-                 // color: Colors.lightBlue,
-                   height: SizeConfig.blockSizeVertical*8,
-                   width: SizeConfig.blockSizeHorizontal*90,
-                   decoration: BoxDecoration(
-                     borderRadius: BorderRadius.circular(24.0),
-                     color: Colors.lightBlue.shade500,
-                   ),
-                   child: Center(
-                       child: FittedBox(
-                           child: Row(
-                             children: [
-                               Icon(Icons.shopping_basket,color: Colors.white,),
-                               SizedBox(width: SizeConfig.blockSizeHorizontal*2,),
-                               FittedBox(child: Text('Check out',style: TextStyle(color: Colors.white),))
-                             ],
-                           )
-                       )
-                   )
-               ),
-             ),
-           )*/
         ],
       ):Center(
         child: FittedBox(
@@ -756,6 +216,353 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
     );
   }
   Widget listItems(){
+
+    return FutureBuilder(
+        future:response,//repo.getProducts(),
+        builder: (context,AsyncSnapshot<CartProductModel> snapshot){
+          if(snapshot.hasData){
+            //  studList=snapshot.data!.data!;
+            //totalPrice();
+            createIndividualTotalPrice(snapshot.data!.data!.length);
+            return ListView.builder(
+                itemCount: snapshot.data!.data!.length,
+                shrinkWrap: true,
+                itemBuilder:(context,index){
+                  print(snapshot.data!.data![index].price);
+
+                  return Slidable(
+                    endActionPane: ActionPane(
+                      motion: const BehindMotion(),
+
+                      children: [
+                        SlidableAction(
+                            icon: Icons.delete,
+                            backgroundColor: Colors.redAccent,
+                            label: 'delete',
+                            onPressed: (context)async{
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                              for(int i=0;i<int.parse(snapshot.data!.data![index].quantity!) ;i++){
+                                setState(() {
+                                  subTotal=subTotal-int.parse(snapshot.data!.data![index].price!)-int.parse(snapshot.data!.data![index].hPrice!);
+                                  prefs.setInt('subTotal', subTotal);
+                                  // total=subTotal-discount;
+                                });
+                                //   prefs.setInt('total', total);
+                              }
+                              await repo.deleteItem(snapshot.data!.data![index].id);
+                              Utils().toastMessage('${snapshot.data!.data![index].product!.name.toString()} deleted ');
+
+                              setState(() {
+                                _loadData();
+                              });
+                            }
+                        )
+                      ],
+                    ),
+                    child: Card(
+                      color: Colors.white,
+                      elevation: 2,
+                      child: SizedBox(
+                        height:SizeConfig.blockSizeVertical*12.3, //90,
+                        width: double.infinity,
+                        //color: Colors.red,
+                        child: Row(
+                          children: [
+                            Container(
+                              height: SizeConfig.blockSizeVertical*10.6,
+                              width:SizeConfig.blockSizeHorizontal*27, //110,
+                              //color: Colors.lightBlue,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                    topLeft:Radius.circular(7),
+                                    bottomLeft:Radius.circular(7)
+
+                                ),
+                                //color: Colors.cyan.shade700,
+                              ),
+                              child: CachedNetworkImage(
+                                imageUrl: Helper.BASE_URL+snapshot.data!.data![index].product!.imagePath.toString(),
+                                placeholder: (context, url) => CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => Icon(Icons.error),
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            Column(
+                              //mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: SizeConfig.blockSizeVertical*3.8,
+                                  width: SizeConfig.blockSizeHorizontal*47.2,
+                                  // color: Colors.black26,
+                                  child: Padding(
+                                      padding:  EdgeInsets.only(
+                                        left:SizeConfig.blockSizeHorizontal*2.6,
+                                        top: SizeConfig.blockSizeVertical*0.7,
+                                        // bottom: SizeConfig.blockSizeVertical*0.4
+                                      ),
+                                      child:Row(
+                                        children: [
+                                          Text(
+                                            snapshot.data!.data![index].product!.name.toString(),
+                                            style: TextStyle(fontSize: SizeConfig.blockSizeVertical*1.9,
+                                                fontWeight: FontWeight.bold
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding:  EdgeInsets.only(
+                                                top:SizeConfig.blockSizeVertical*0.4,
+                                                left: SizeConfig.blockSizeHorizontal*0.5
+                                            ),
+                                            child: Text.rich(
+                                                TextSpan(
+                                                    text: '(',style:TextStyle(
+                                                  fontSize: SizeConfig.blockSizeVertical*1.8,
+                                                  // fontWeight: FontWeight.bold,
+                                                ) ,
+                                                    children: <InlineSpan>[
+                                                      TextSpan(
+                                                        text: '৳',
+                                                        style: TextStyle(
+                                                          fontSize: SizeConfig.blockSizeVertical*1.7,
+                                                          //fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: snapshot.data!.data![index].price.toString(),
+                                                        style: TextStyle(
+                                                            fontSize: SizeConfig.blockSizeVertical*1.7,
+                                                            color: Colors.red
+                                                        ),
+
+                                                      ),
+                                                      TextSpan(
+                                                        text: ')',
+                                                        style: TextStyle(
+                                                            fontSize: SizeConfig.blockSizeVertical*1.8,
+                                                            // fontWeight: FontWeight.bold,
+                                                            fontStyle: FontStyle.italic,
+                                                            color: Colors.black45
+                                                        ),
+
+                                                      )
+                                                    ]
+                                                )),
+                                          ),
+
+                                        ],
+                                      )
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: SizeConfig.blockSizeVertical*2.9,
+                                  width: SizeConfig.blockSizeHorizontal*42.2,
+                                  // color: Colors.green,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      left:SizeConfig.blockSizeHorizontal*2.6,
+                                      top: SizeConfig.blockSizeVertical*0.7,
+                                      //  bottom: SizeConfig.blockSizeVertical*0.4
+
+                                    ),
+                                    child:snapshot.data!.data![index].service!=null?
+                                    RichText(
+                                      text: TextSpan(
+                                          text: snapshot.data!.data![index].service!.name.toString(),
+                                          style: TextStyle(
+                                            fontSize: SizeConfig.blockSizeVertical*1.4,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.indigo.shade700,),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: int.parse(snapshot.data!.data![index].hPrice.toString())!=0
+                                                  ?' (with Hanger ৳${snapshot.data!.data![index].hPrice} )':' ',
+                                              style: TextStyle(
+                                                fontSize: SizeConfig.blockSizeVertical*1.4,
+                                                fontWeight: FontWeight.normal,),
+                                            )
+                                          ]
+                                      ),
+                                    ):Text(''),
+
+                                    /*Text(
+                                              snapshot.data!.data![index].service!.name.toString(),
+                                              style: TextStyle(
+                                                  fontSize: SizeConfig.blockSizeVertical*2.0,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.lightBlue.shade700,
+                                                  fontStyle: FontStyle.italic),
+                                            ),*/
+                                  ),
+                                ),
+                                SizedBox(
+                                    height: SizeConfig.blockSizeVertical*4.2,
+                                    width: SizeConfig.blockSizeHorizontal*45.2,
+                                    //color: Colors.yellow,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          height: SizeConfig.blockSizeVertical*4.5,
+                                          width: SizeConfig.blockSizeHorizontal*42.2,
+                                          //color: Colors.lightBlue,
+                                          child: Center(
+                                            child: Row(
+                                              children: [
+                                                SizedBox(width: SizeConfig.blockSizeHorizontal*1,),
+                                                IconButton(
+                                                  onPressed: ()async{
+                                                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                    if(int.parse(snapshot.data!.data![index].quantity!)>1){
+                                                      await repo.updateQuantity(-1, snapshot.data!.data![index].id!);
+                                                      setState(() {
+                                                        //snapshot!.data!.data![index].quantity!;
+
+                                                        _loadData();
+                                                        subTotal=subTotal-int.parse(snapshot.data!.data![index].price!)-int.parse(snapshot.data!.data![index].hPrice!);
+                                                        indTotalPrice[index] = indTotalPrice[index] -int.parse(snapshot.data!.data![index].price!)-int.parse(snapshot.data!.data![index].hPrice!);
+
+                                                        //  total=subTotal-discount;
+
+                                                      });
+                                                      prefs.setInt('subTotal', subTotal);
+                                                      //  prefs.setInt('total', total);
+                                                      //EasyLoading.showSuccess('Updated!');
+                                                      EasyLoading.dismiss();
+
+                                                    }
+                                                    else{
+                                                      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+                                                      setState(()  {
+
+                                                        for(int i=0;i< int.parse(snapshot.data!.data![index].quantity!);i++){
+                                                          subTotal=subTotal-int.parse(snapshot.data!.data![index].price!)-int.parse(snapshot.data!.data![index].hPrice!);
+                                                          // total=subTotal-discount;
+
+                                                        }
+
+                                                      });
+                                                      prefs.setInt('subTotal', subTotal);
+                                                      // prefs.setInt('total', total);
+                                                      await repo.deleteItem(snapshot.data!.data![index].id);
+                                                      _loadData();
+
+
+                                                    }
+
+
+                                                  },
+                                                  icon:Icon(Icons.remove_circle,color: Colors.indigo.shade400,size: SizeConfig.blockSizeVertical*4,), //Image.asset('assets/images/minus.png',),
+                                                ),
+                                                SizedBox(width: SizeConfig.blockSizeHorizontal*4,),
+                                                Padding(
+                                                  padding:  EdgeInsets.only(top:SizeConfig.blockSizeVertical*1.5),
+                                                  child: Text(snapshot.data!.data![index].quantity!.toString(),style: TextStyle(fontWeight: FontWeight.bold),),
+                                                ),
+                                                SizedBox(width: SizeConfig.blockSizeHorizontal*4.5,),
+                                                IconButton(
+                                                  onPressed: ()async{
+                                                    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                                                    await repo.updateQuantity( 1, snapshot.data!.data![index].id!);
+                                                    setState(() {
+
+                                                      _loadData();
+                                                      subTotal=subTotal+int.parse(snapshot.data!.data![index].price!)+int.parse(snapshot.data!.data![index].hPrice!);
+                                                      indTotalPrice[index] = indTotalPrice[index]+int.parse(snapshot.data!.data![index].price!)+int.parse(snapshot.data!.data![index].hPrice!);
+                                                      //total=subTotal-discount;
+
+                                                    });
+                                                    prefs.setInt('subTotal', subTotal);
+                                                    // prefs.setInt('total', total);
+
+                                                    // EasyLoading.dismiss();
+                                                  },
+                                                  icon:Icon(Icons.add_circle,color: Colors.indigo.shade400,size: SizeConfig.blockSizeVertical*4,), //Image.asset('assets/images/add.png'),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                      ],
+                                    )
+                                ),
+
+                              ],
+                            ),
+
+                            Container(
+                                height: SizeConfig.blockSizeVertical*11.5,
+                                width: SizeConfig.blockSizeHorizontal*23,
+                                //color: Colors.grey,
+                                child: Padding(
+                                  padding:  EdgeInsets.symmetric(
+                                      vertical: SizeConfig.blockSizeVertical*3.8
+                                  ),
+                                  child: Column(
+
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+
+                                      Text.rich(
+                                          TextSpan(
+                                              text: 'total:',style:TextStyle(
+                                              fontSize: SizeConfig.blockSizeVertical*2,
+                                              fontWeight: FontWeight.bold,
+                                              fontStyle: FontStyle.italic,
+                                              color:  Colors.black
+                                          ) ,
+                                              children: <InlineSpan>[
+                                                TextSpan(
+                                                  text: '৳',
+                                                  style: TextStyle(
+                                                      fontSize: SizeConfig.blockSizeVertical*2,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontStyle: FontStyle.italic,
+                                                      color: Colors.black45
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: indTotalPrice[index].toString(),
+                                                  style: TextStyle(
+                                                      fontSize: SizeConfig.blockSizeVertical*2,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontStyle: FontStyle.italic,
+                                                      color: Colors.redAccent
+                                                  ),
+                                                )
+                                              ]
+                                          )),
+                                    ],
+                                  ),
+                                )
+
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+            );
+          }
+
+
+          else{
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+
+          }
+        }
+
+    );
+
+
+  }
+  /*Widget listItems(){
     return Card(
       elevation: 10,
       child: Container(
@@ -857,7 +664,7 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
         ),
       ),
     );
-  }
+  }*/
   Widget paintedBoxBeforeSignIn(){
     return Container(
         height:SizeConfig.blockSizeVertical*30,

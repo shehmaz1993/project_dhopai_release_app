@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Products/search_product.dart';
+import 'Repository/log_debugger.dart';
 import 'orderFile/order_rev.dart';
 import 'utils/Size.dart';
 import 'dart:convert';
@@ -28,6 +29,8 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
   late AnimationController _controller2;
   late Animation<double> animation2;
   Future<List<dynamic>>? response;
+  Future<PromotionModel>? response1;
+  Future<List<TopOrders>>? response2;
   String? token;
   String? area;
   Repository _repo =Repository();
@@ -69,6 +72,8 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
     loadingToken();
     loadNumberOfProduct();
     response = fetchServices();
+    response1 =_repo.getAds();
+    response2 = _repo.getLatest5Orders();
     _controller2 = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
@@ -81,15 +86,19 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
   }
   @override
   void dispose() {
-    _controller2.dispose();
     super.dispose();
-
+    _controller2.dispose();
+  }
+  @override
+  void deactivate() {
+    super.deactivate();
   }
   @override
   bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    LogDebugger.instance.i('Home');
     super.build(context);
     SizeConfig().init(context);
     return PopScope(
@@ -137,8 +146,8 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
                       ),
                       SizedBox(width: SizeConfig.blockSizeHorizontal*47,),
                       InkWell(
-                        onTap: (){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => OrderRev()));
+                        onTap: () async {
+                         await Navigator.of(context).push(MaterialPageRoute(builder: (context) => OrderRev()));
                         },
                         child: badges.Badge(
                             badgeContent: Text(numberOfProduct.toString()),
@@ -157,8 +166,8 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
                     ),
                     child: GestureDetector(
                       onTap: (){
-                      //  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchProduct()));
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>SearchProduct()));
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchProduct()));
+                      //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>SearchProduct()));
                       },
                       child: Container(
                         height: SizeConfig.blockSizeVertical*5,
@@ -196,145 +205,8 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
         body:  ListView(
           shrinkWrap: true,
           children: [
-
-            SizedBox(
-              height:SizeConfig.blockSizeVertical*28 ,
-              width: double.maxFinite,
-              child: FutureBuilder(
-                   key: _serviceKey,
-                  future: response,
-                  builder: (BuildContext context,AsyncSnapshot snapshot){
-                    if(snapshot.hasData){
-                      print(snapshot.data);
-                      return ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        //cacheExtent: double.maxFinite,
-                        physics: const BouncingScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (BuildContext context,int index){
-                          return  Padding(
-                              padding:EdgeInsets.only(
-                                left:index==0? SizeConfig.blockSizeHorizontal*0.3:
-                                SizeConfig.blockSizeHorizontal*0.2,
-                                bottom: SizeConfig.blockSizeVertical*3,
-                                top: SizeConfig.blockSizeVertical*3,
-
-                              ),
-                              child: services(
-                                  snapshot.data[index]['name'],
-                                  image[index],snapshot.data[index]['id'],
-                                  index
-                              )
-                          );
-                        },
-                      );
-                    }
-
-                    else{
-                      print(snapshot.error.toString());
-                      return const Center(
-                        child: CircularProgressIndicator(),
-
-                      );
-
-                    }
-                  }
-              ),
-            ),
-
-            FutureBuilder<PromotionModel>(
-                key: _adKey,
-                future:_repo.getAds() ,
-                builder:(BuildContext context,AsyncSnapshot<PromotionModel> snapshot){
-                  if(snapshot.hasData){
-                    return Padding(
-                      padding: EdgeInsets.only(
-                          left:SizeConfig.blockSizeHorizontal*2,
-                          right: SizeConfig.blockSizeHorizontal*1.0
-                      ),
-                      child: Container(
-                        height:SizeConfig.blockSizeVertical*30.0,
-                        width: double.infinity,
-                        color: Colors.grey[200],
-                        child:Row(
-                          children: [
-                            Container(
-                              height: SizeConfig.blockSizeVertical*30,
-                              width: SizeConfig.blockSizeHorizontal*57,
-                              color: Colors.grey.shade200,
-
-
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children:  [
-                                  //const Spacer(flex: 1,),
-                                  Padding(
-                                    padding:  EdgeInsets.only(
-                                        left: SizeConfig.blockSizeHorizontal*2.5,
-                                        top: SizeConfig.blockSizeVertical*4.5
-                                    ),
-                                    child: FadeTransition(
-                                        opacity: animation2,
-                                        child: Text(snapshot.data!.title.toString(),style:TextStyle(fontSize: SizeConfig.blockSizeVertical*3),)),
-                                  ),
-                                  //Spacer(flex: 1,),
-                                  Padding(
-                                      padding:  EdgeInsets.only(
-                                          left: SizeConfig.blockSizeHorizontal*2.5,
-                                          top: SizeConfig.blockSizeVertical*4.5
-                                      ),
-                                      child: Text(snapshot.data!.description.toString(),style:TextStyle(fontSize: SizeConfig.blockSizeVertical*1.8),)
-                                  ),
-                                  Padding(
-                                    padding:  EdgeInsets.only(
-                                        left: SizeConfig.blockSizeHorizontal*2.5,
-                                        top: SizeConfig.blockSizeVertical*4.5
-                                    ),
-                                    child: Container(
-
-                                      height: SizeConfig.blockSizeVertical*3.5,
-                                      width: SizeConfig.blockSizeHorizontal*50,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(3),
-                                        color: Colors.indigo.shade700,
-                                      ),
-                                      child: Center(child: Text('Learn more',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2),)),
-                                    ),
-                                  )
-
-
-
-                                ],
-                              ),
-                            ),
-
-                            Container(
-                                color:Colors.grey[100],
-                                height:SizeConfig.blockSizeVertical*30, //220,
-                                width:SizeConfig.blockSizeHorizontal*39, //170,
-
-                                child: Padding(
-                                    padding: EdgeInsets.only(top: SizeConfig.blockSizeVertical*4.8),
-                                    child:Image.network(
-                                      Helper.BASE_URL + snapshot.data!.image.toString(),
-                                      height: SizeConfig.blockSizeVertical*8,
-                                      width: SizeConfig.blockSizeHorizontal*15,
-                                    )
-                                )   //Image.asset('assets/images/clo.png',height: 100,width: 100,)),
-                            )
-
-
-                          ],
-                        ) ,
-                      ),
-                    );
-                  }
-                  else{
-                    return Center(child: CircularProgressIndicator());
-                  }
-                }),
-
+            AvailableServiceBoxes(),
+            promotionalBox(),
             token!=null?ListTile(
               leading:Padding(
                 padding: EdgeInsets.only(
@@ -360,13 +232,155 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
       ),
     );
   }
+  Widget promotionalBox(){
+
+    return  FutureBuilder<PromotionModel>(
+        key: _adKey,
+        future:response1 ,
+        builder:(BuildContext context,AsyncSnapshot<PromotionModel> snapshot){
+          if(snapshot.hasData){
+            return Padding(
+              padding: EdgeInsets.only(
+                  left:SizeConfig.blockSizeHorizontal*2,
+                  right: SizeConfig.blockSizeHorizontal*1.0
+              ),
+              child: Container(
+                height:SizeConfig.blockSizeVertical*30.0,
+                width: double.infinity,
+                color: Colors.grey[200],
+                child:Row(
+                  children: [
+                    Container(
+                      height: SizeConfig.blockSizeVertical*30,
+                      width: SizeConfig.blockSizeHorizontal*57,
+                      color: Colors.grey.shade200,
+
+
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children:  [
+                          //const Spacer(flex: 1,),
+                          Padding(
+                            padding:  EdgeInsets.only(
+                                left: SizeConfig.blockSizeHorizontal*2.5,
+                                top: SizeConfig.blockSizeVertical*4.5
+                            ),
+                            child: FadeTransition(
+                                opacity: animation2,
+                                child: Text(snapshot.data!.title.toString(),style:TextStyle(fontSize: SizeConfig.blockSizeVertical*3),)),
+                          ),
+                          //Spacer(flex: 1,),
+                          Padding(
+                              padding:  EdgeInsets.only(
+                                  left: SizeConfig.blockSizeHorizontal*2.5,
+                                  top: SizeConfig.blockSizeVertical*4.5
+                              ),
+                              child: Text(snapshot.data!.description.toString(),style:TextStyle(fontSize: SizeConfig.blockSizeVertical*1.8),)
+                          ),
+                          Padding(
+                            padding:  EdgeInsets.only(
+                                left: SizeConfig.blockSizeHorizontal*2.5,
+                                top: SizeConfig.blockSizeVertical*4.5
+                            ),
+                            child: Container(
+
+                              height: SizeConfig.blockSizeVertical*3.5,
+                              width: SizeConfig.blockSizeHorizontal*50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(3),
+                                color: Colors.indigo.shade700,
+                              ),
+                              child: Center(child: Text('Learn more',style: TextStyle(color: Colors.white,fontSize: SizeConfig.blockSizeVertical*2),)),
+                            ),
+                          )
+
+
+
+                        ],
+                      ),
+                    ),
+
+                    Container(
+                        color:Colors.grey[100],
+                        height:SizeConfig.blockSizeVertical*30, //220,
+                        width:SizeConfig.blockSizeHorizontal*39, //170,
+
+                        child: Padding(
+                            padding: EdgeInsets.only(top: SizeConfig.blockSizeVertical*4.8),
+                            child:Image.network(
+                              Helper.BASE_URL + snapshot.data!.image.toString(),
+                              height: SizeConfig.blockSizeVertical*8,
+                              width: SizeConfig.blockSizeHorizontal*15,
+                            )
+                        )   //Image.asset('assets/images/clo.png',height: 100,width: 100,)),
+                    )
+
+
+                  ],
+                ) ,
+              ),
+            );
+          }
+          else{
+            return Center(child: CircularProgressIndicator());
+          }
+        });
+
+  }
+  Widget AvailableServiceBoxes(){
+    return  SizedBox(
+      height:SizeConfig.blockSizeVertical*28 ,
+      width: double.maxFinite,
+      child: FutureBuilder(
+          key: _serviceKey,
+          future: response,
+          builder: (BuildContext context,AsyncSnapshot snapshot){
+            if(snapshot.hasData){
+              print(snapshot.data);
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                //cacheExtent: double.maxFinite,
+                physics: const BouncingScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context,int index){
+                  return  Padding(
+                      padding:EdgeInsets.only(
+                        left:index==0? SizeConfig.blockSizeHorizontal*0.3:
+                        SizeConfig.blockSizeHorizontal*0.2,
+                        bottom: SizeConfig.blockSizeVertical*3,
+                        top: SizeConfig.blockSizeVertical*3,
+
+                      ),
+                      child: services(
+                          snapshot.data[index]['name'],
+                          image[index],snapshot.data[index]['id'],
+                          index
+                      )
+                  );
+                },
+              );
+            }
+
+            else{
+              print(snapshot.error.toString());
+              return const Center(
+                child: CircularProgressIndicator(),
+
+              );
+
+            }
+          }
+      ),
+    );
+  }
   Widget services(String serviceName, String imagePath,int id,int index){
     return Padding(
       padding:  EdgeInsets.only(left:SizeConfig.blockSizeHorizontal*3.08),
       child: GestureDetector(
-        onTap: (){
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>ProductList(index)));
-          //Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductList(index)));
+        onTap: () async {
+         // Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>ProductList(index)));
+         await Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductList(index)));
         },
         child: Card(
           elevation: 3,
@@ -412,7 +426,7 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
   Widget generateOrderList(){
     return  FutureBuilder<List<TopOrders>>(
         key: _historyKey,
-        future:_repo.getLatest5Orders(),
+        future:response2,
         builder: (BuildContext context,AsyncSnapshot<List<TopOrders>> snapshot){
           if(snapshot.connectionState == ConnectionState.done){
             if(snapshot.hasData){
@@ -457,9 +471,9 @@ class _HomeState extends State<Home>with TickerProviderStateMixin, AutomaticKeep
           SizeConfig.blockSizeVertical*.05
       ),
       child: InkWell(
-        onTap: (){
-         // Navigator.of(context).push(MaterialPageRoute(builder: (context) =>OrderTrackUI(orderId:id)));
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>OrderTrackUI(orderId:id)));
+        onTap: () async {
+         await Navigator.of(context).push(MaterialPageRoute(builder: (context) =>OrderTrackUI(orderId:id)));
+        //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>OrderTrackUI(orderId:id)));
         },
         child: Card(
           elevation: 2,

@@ -64,11 +64,16 @@ void configLoading() {
    // ..customAnimation = CustomAnimation();
 }
 
-class MyApp extends StatelessWidget {
- // final String isLogin;
-  //const MyApp({Key? key,required this.isLogin}) : super(key: key);
-  const MyApp({Key? key}) : super(key: key);
-  // This widget is the root of your application.
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -116,9 +121,9 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-       // title: 'Flutter Demo',
-        navigatorKey: GlobalVariable.navState,
-        debugShowCheckedModeBanner: false,
+        // title: 'Flutter Demo',
+         navigatorKey: MyApp.navigatorKey,
+         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
@@ -128,6 +133,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 /*class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
