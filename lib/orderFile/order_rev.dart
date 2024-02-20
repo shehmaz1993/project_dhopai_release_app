@@ -270,7 +270,7 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
                           children: [
                             Container(
                               height: SizeConfig.blockSizeVertical*10.6,
-                              width:SizeConfig.blockSizeHorizontal*27, //110,
+                              width:SizeConfig.blockSizeHorizontal*25, //110,
                               //color: Colors.lightBlue,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.only(
@@ -293,8 +293,8 @@ class _OrderRevState extends State<OrderRev> with SingleTickerProviderStateMixin
                               children: [
                                 Container(
                                   height: SizeConfig.blockSizeVertical*3.8,
-                                  width: SizeConfig.blockSizeHorizontal*47.2,
-                                  // color: Colors.black26,
+                                  width: SizeConfig.blockSizeHorizontal*48.2,
+                                  //color: Colors.black26,
                                   child: Padding(
                                       padding:  EdgeInsets.only(
                                         left:SizeConfig.blockSizeHorizontal*2.6,
